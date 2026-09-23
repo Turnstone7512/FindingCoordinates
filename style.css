@@ -108,6 +108,7 @@ h2 {
 }
 
 .query-time {
+  white-space: pre-line;
   margin: 14px 0;
   color: #475569;
 }

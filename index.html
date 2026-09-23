@@ -10,28 +10,36 @@
   <main class="container">
     <header>
       <h1>Finding Coordinates</h1>
-      <p>依台灣時間查詢未來一小時內開始的時區資訊與座標</p>
+      <p>指定當地時間 A，找出從時間 B 起一小時內會到達 A 的城市與座標</p>
     </header>
 
     <section class="card">
+      <form id="queryForm">
+      <div class="manual-area">
+        <label for="targetTime">指定時間 A（各城市當地日期時間）</label>
+        <input id="targetTime" type="text" placeholder="20260923 11:00" maxlength="14" required>
+        <small>格式：YYYYMMDD HH:MM。比對完整日期，包含 B 到 B＋60 分鐘。</small>
+      </div>
       <div class="mode">
         <label>
           <input type="radio" name="mode" value="now" checked>
-          使用目前台灣時間
+          時間 B：目前台灣時間
         </label>
         <label>
           <input type="radio" name="mode" value="manual">
-          手動輸入日期時間
+          時間 B：手動輸入台灣時間
         </label>
       </div>
 
       <div id="manualArea" class="manual-area hidden">
-        <label for="dateTime">日期時間</label>
-        <input id="dateTime" type="text" placeholder="20260731 15:30" maxlength="13">
-        <small>格式：YYYYMMDD HH:MM，例如 20260731 15:30</small>
+        <label for="dateTime">時間 B（台灣時間 UTC+8）</label>
+        <input id="dateTime" type="text" placeholder="20260923 09:53" maxlength="14">
+        <small>格式：YYYYMMDD HH:MM，例如 20260923 09:53</small>
       </div>
 
-      <button id="queryBtn">查詢</button>
+      <button id="queryBtn" type="submit">查詢</button>
+      </form>
+      <p><small>查詢內建城市清單；各城市時區依查詢日期套用夏令時間。</small></p>
     </section>
 
     <section class="card">
@@ -40,7 +48,7 @@
         <button id="copyBtn" class="secondary" disabled>複製結果</button>
       </div>
       <div id="queryTime" class="query-time"></div>
-      <pre id="result">請輸入條件後按「查詢」。</pre>
+      <pre id="result" aria-live="polite">請輸入條件後按「查詢」。</pre>
     </section>
   </main>
 

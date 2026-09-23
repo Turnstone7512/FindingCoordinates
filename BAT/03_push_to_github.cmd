@@ -1,50 +1,38 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 chcp 65001 >nul
-
-set "REPO_DIR=E:\Programs\GitHub\FindingCoordinates"
-set "VERSION=20260923-0001"
-set "CHANGE_SUMMARY_B64=5bu66L+u5Lqk5rW35qCE5ZyL5q2j6Lqr6auY6auU6YeN5ZWP5a6a5oC75qCE5ZyL"
-set "COMMIT_MSG_FILE=%TEMP%\finding-coordinates-commit-message.txt"
-
-cd /d "%REPO_DIR%"
-if errorlevel 1 (
-  echo Cannot open repo directory: %REPO_DIR%
-  pause
-  exit /b 1
-)
-
-git -C "%REPO_DIR%" status
-
-git -C "%REPO_DIR%" add -A
-
-git -C "%REPO_DIR%" diff --cached --quiet
-if %errorlevel%==0 (
-  echo No changes to commit.
-  pause
-  exit /b 0
-)
-
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$summary=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:CHANGE_SUMMARY_B64)); $message=$env:VERSION + ' - ' + $summary; [IO.File]::WriteAllText($env:COMMIT_MSG_FILE, $message, (New-Object Text.UTF8Encoding $false)); Write-Host ('Commit message: ' + $message)"
-if errorlevel 1 (
-  echo Failed to prepare commit message.
-  pause
-  exit /b 1
-)
-
-git -C "%REPO_DIR%" commit -F "%COMMIT_MSG_FILE%"
-if errorlevel 1 (
-  echo Commit failed.
-  pause
-  exit /b 1
-)
-
-git -C "%REPO_DIR%" push origin main
-if errorlevel 1 (
-  echo Push failed.
-  pause
-  exit /b 1
-)
-
-echo Push completed.
+cd /d "%~dp0.."
+if errorlevel 1 goto failed
+where git >nul 2>nul
+if errorlevel 1 goto failed
+git rev-parse --show-toplevel
+if errorlevel 1 goto failed
+set "BRANCH="
+for /f "delims=" %%B in ('git branch --show-current') do set "BRANCH=%%B"
+if not defined BRANCH goto failed
+echo Uploading branch: %BRANCH%
+git remote get-url origin
+if errorlevel 1 goto failed
+git status --short
+git add -A
+if errorlevel 1 goto failed
+git diff --cached --quiet
+if errorlevel 2 goto failed
+if errorlevel 1 goto commit
+echo No new changes. Pushing any existing local commits.
+goto push
+:commit
+git commit -m "Update FindingCoordinates"
+if errorlevel 1 goto failed
+:push
+git push -u origin "%BRANCH%"
+if errorlevel 1 goto failed
+echo Push completed. On GitHub, select branch: %BRANCH%
+echo The upload script is inside the BAT folder.
+echo Website publication is separate from uploading repository files.
 pause
+exit /b 0
+:failed
+echo Upload failed. Please read the error above. Your local files are preserved.
+pause
+exit /b 1

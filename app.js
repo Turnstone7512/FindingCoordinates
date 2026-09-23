@@ -10,8 +10,8 @@ const CITIES = [
   { name: "台北", lat: 25.033429, lon: 121.537823, tz: "Asia/Taipei" },
   { name: "曼谷", lat: 13.748380, lon: 100.503438, tz: "Asia/Bangkok" },
   { name: "胡志明市", lat: 10.792277, lon: 106.680761, tz: "Asia/Ho_Chi_Minh" },
-  { name: "加德滿都", lat: 27.700214, lon: 85.356936, tz: "Asia/Kathmandu", offsetMinutes: 15 },
-  { name: "可倫坡", lat: 6.927426, lon: 79.844689, tz: "Asia/Colombo", offsetMinutes: 30 },
+  { name: "加德滿都", lat: 27.700214, lon: 85.356936, tz: "Asia/Kathmandu" },
+  { name: "可倫坡", lat: 6.927426, lon: 79.844689, tz: "Asia/Colombo" },
   { name: "馬爾地夫", lat: 4.176791, lon: 73.518123, tz: "Indian/Maldives" },
   { name: "杜拜", lat: 25.254678, lon: 55.304404, tz: "Asia/Dubai" },
   { name: "科威特城", lat: 29.374533, lon: 47.987123, tz: "Asia/Kuwait" },
@@ -20,7 +20,7 @@ const CITIES = [
   { name: "倫敦", lat: 51.510223, lon: -0.133832, tz: "Europe/London" },
   { name: "英雄港", lat: 38.656718, lon: -27.219463, tz: "Atlantic/Azores" },
   { name: "雷克雅維克", lat: 64.145725, lon: -21.926867, tz: "Atlantic/Reykjavik" },
-  { name: "聖約翰", lat: 47.560547, lon: -52.756198, tz: "America/St_Johns", offsetMinutes: 30 },
+  { name: "聖約翰", lat: 47.560547, lon: -52.756198, tz: "America/St_Johns" },
   { name: "哈利法斯", lat: 44.670640, lon: -63.574253, tz: "America/Halifax" },
   { name: "聖保羅", lat: -23.555305, lon: -46.662340, tz: "America/Sao_Paulo" },
   { name: "聖路易斯", lat: -2.518875, lon: -44.225159, tz: "America/Fortaleza" },
@@ -33,222 +33,129 @@ const CITIES = [
   { name: "美屬薩摩亞", lat: -14.277986, lon: -170.687944, tz: "Pacific/Pago_Pago" }
 ];
 
-const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
 const TAIPEI_TZ = "Asia/Taipei";
+const MINUTE = 60000;
+const formatters = new Map();
 
-const modeInputs = document.querySelectorAll('input[name="mode"]');
-const manualArea = document.getElementById("manualArea");
-const dateTimeInput = document.getElementById("dateTime");
-const queryBtn = document.getElementById("queryBtn");
-const copyBtn = document.getElementById("copyBtn");
-const resultEl = document.getElementById("result");
-const queryTimeEl = document.getElementById("queryTime");
-
-modeInputs.forEach(input => {
-  input.addEventListener("change", () => {
-    manualArea.classList.toggle("hidden", input.value !== "manual");
-  });
-});
-
-queryBtn.addEventListener("click", runQuery);
-copyBtn.addEventListener("click", async () => {
-  await navigator.clipboard.writeText(resultEl.textContent);
-  copyBtn.textContent = "已複製";
-  setTimeout(() => copyBtn.textContent = "複製結果", 1200);
-});
-
-function getSelectedMode() {
-  return document.querySelector('input[name="mode"]:checked').value;
+function parseWallTime(value) {
+  const match = value.trim().match(/^(\d{4})(\d{2})(\d{2})\s+(\d{2}):(\d{2})$/);
+  if (!match) throw new Error("請使用 YYYYMMDD HH:MM，例如 20260923 11:00。");
+  const [, y, mo, d, h, mi] = match.map(Number);
+  const date = new Date(0);
+  date.setUTCFullYear(y, mo - 1, d);
+  date.setUTCHours(h, mi, 0, 0);
+  if (y < 1 || date.getUTCFullYear() !== y || date.getUTCMonth() !== mo - 1 ||
+      date.getUTCDate() !== d || date.getUTCHours() !== h || date.getUTCMinutes() !== mi) {
+    throw new Error("日期時間無效，請確認日期與時間。");
+  }
+  return date.getTime();
 }
 
 function parseTaipeiInput(value) {
-  const match = value.trim().match(/^(\d{4})(\d{2})(\d{2})\s+(\d{2}):(\d{2})$/);
-  if (!match) {
-    throw new Error("日期時間格式錯誤，請使用 YYYYMMDD HH:MM，例如 20260731 15:30。");
-  }
-
-  const [, y, mo, d, h, mi] = match.map(Number);
-  const date = new Date(Date.UTC(y, mo - 1, d, h, mi));
-
-  if (
-    date.getUTCFullYear() !== y ||
-    date.getUTCMonth() !== mo - 1 ||
-    date.getUTCDate() !== d ||
-    date.getUTCHours() !== h ||
-    date.getUTCMinutes() !== mi
-  ) {
-    throw new Error("日期時間無效，請確認日期與時間。");
-  }
-
-  // 輸入視為台灣時間 UTC+8。
-  return new Date(date.getTime() - 8 * 60 * 60 * 1000);
-}
-
-function getTaipeiNow() {
-  const parts = getDateTimeParts(new Date(), TAIPEI_TZ);
-  return partsToInstant(parts, 8 * 60);
+  return new Date(parseWallTime(value) - 8 * 60 * MINUTE);
 }
 
 function getDateTimeParts(date, timeZone) {
-  const formatter = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23"
-  });
-
-  const parts = Object.fromEntries(
-    formatter.formatToParts(date)
-      .filter(p => p.type !== "literal")
-      .map(p => [p.type, Number(p.value)])
-  );
-
-  return {
-    year: parts.year,
-    month: parts.month,
-    day: parts.day,
-    hour: parts.hour,
-    minute: parts.minute,
-    second: parts.second || 0
-  };
+  if (!formatters.has(timeZone)) {
+    formatters.set(timeZone, new Intl.DateTimeFormat("en-CA", {
+      timeZone, year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+    }));
+  }
+  return Object.fromEntries(formatters.get(timeZone).formatToParts(date)
+    .filter(p => p.type !== "literal").map(p => [p.type, Number(p.value)]));
 }
 
-function partsToInstant(parts, offsetMinutes) {
-  return new Date(Date.UTC(
-    parts.year,
-    parts.month - 1,
-    parts.day,
-    parts.hour,
-    parts.minute,
-    parts.second
-  ) - offsetMinutes * 60 * 1000);
+function wallTimeFromParts(p) {
+  const date = new Date(0);
+  date.setUTCFullYear(p.year, p.month - 1, p.day);
+  date.setUTCHours(p.hour, p.minute, p.second, 0);
+  return date.getTime();
 }
 
-function formatTime(hour, minute) {
-  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+function formatDateTime(date, timeZone) {
+  const p = getDateTimeParts(date, timeZone);
+  const pad = n => String(n).padStart(2, "0");
+  return `${String(p.year).padStart(4, "0")}${pad(p.month)}${pad(p.day)} ${pad(p.hour)}:${pad(p.minute)}:${pad(p.second)}`;
 }
 
-function getLocalDateParts(instant, city) {
-  return getDateTimeParts(instant, city.tz);
-}
-
-function getDateLabel(parts) {
-  return `${parts.month}/${parts.day}(${WEEKDAYS[new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay()]})`;
-}
-
-function getOffsetMinutes(instant, timeZone) {
-  const p = getDateTimeParts(instant, timeZone);
-  const utcRepresentation = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
-  return Math.round((utcRepresentation - instant.getTime()) / 60000);
-}
-
-function getLocalEventInstant(city, year, month, day) {
-  // 每個城市的活動固定為當地時間 18:00-19:00。
-  // 透過 Intl 取得該城市當日 UTC offset，因此可正確處理夏令時間。
-  const localWallTime = Date.UTC(year, month - 1, day, 18, 0, 0);
-  let instant = new Date(localWallTime);
-
-  let offset = getOffsetMinutes(instant, city.tz);
-  instant = new Date(localWallTime - offset * 60000);
-
-  // DST 切換附近重新取得 offset，避免第一次估算落在不同 offset。
-  offset = getOffsetMinutes(instant, city.tz);
-  instant = new Date(localWallTime - offset * 60000);
-
-  return instant;
-}
-
-function formatTaipeiEvent(instant, city) {
-  const start = getDateTimeParts(instant, TAIPEI_TZ);
-  const endInstant = new Date(instant.getTime() + 60 * 60 * 1000);
-  const end = getDateTimeParts(endInstant, TAIPEI_TZ);
-
-  return `${getDateLabel(start)} ${formatTime(start.hour, start.minute)}-${formatTime(end.hour, end.minute)} ${city.name} ${city.lat.toFixed(6)}, ${city.lon.toFixed(6)}`;
-}
-
-function getCandidateDates(queryStart) {
-  const p = getDateTimeParts(queryStart, TAIPEI_TZ);
-  const base = new Date(Date.UTC(p.year, p.month - 1, p.day));
-
-  return [-1, 0, 1].map(delta => {
-    const d = new Date(base.getTime() + delta * 24 * 60 * 60 * 1000);
-    return {
-      year: d.getUTCFullYear(),
-      month: d.getUTCMonth() + 1,
-      day: d.getUTCDate()
-    };
-  });
-}
-
-function getEventWindow(queryInstant) {
-  // 依範例：輸入 15:30 時，以 15:00 作為查詢起點，
-  // 查詢「輸入時間所在整點～下一個整點結束前」開始的活動。
-  const taipei = getDateTimeParts(queryInstant, TAIPEI_TZ);
-  const baseTaipei = new Date(Date.UTC(
-    taipei.year, taipei.month - 1, taipei.day, taipei.hour, 0, 0
-  ) - 8 * 60 * 60 * 1000);
-
-  return {
-    start: baseTaipei,
-    end: new Date(baseTaipei.getTime() + 2 * 60 * 60 * 1000)
-  };
-}
-
-function runQuery() {
-  try {
-    let queryInstant;
-
-    if (getSelectedMode() === "now") {
-      queryInstant = new Date();
-    } else {
-      queryInstant = parseTaipeiInput(dateTimeInput.value);
+function findMatches(targetWallTime, queryInstant, cities = CITIES) {
+  const start = queryInstant.getTime();
+  const end = start + 60 * MINUTE;
+  const rows = [];
+  for (const city of cities) {
+    // Sample offsets inside the actual window to handle DST changes.
+    const offsets = new Set();
+    for (let time = start; time <= end; time += MINUTE) {
+      const wholeSecond = Math.floor(time / 1000) * 1000;
+      offsets.add(wallTimeFromParts(getDateTimeParts(new Date(wholeSecond), city.tz)) - wholeSecond);
     }
-
-    const { start, end } = getEventWindow(queryInstant);
-    const rows = [];
-    const candidateDates = getCandidateDates(start);
-
-    for (const city of CITIES) {
-      for (const date of candidateDates) {
-        const eventInstant = getLocalEventInstant(
-          city,
-          date.year,
-          date.month,
-          date.day
-        );
-
-        if (eventInstant >= start && eventInstant < end) {
-          rows.push({
-            city,
-            instant: eventInstant,
-            text: formatTaipeiEvent(eventInstant, city)
-          });
-        }
+    for (const offset of offsets) {
+      const time = targetWallTime - offset;
+      const instant = new Date(time);
+      // Verification rejects nonexistent times and preserves repeated local times.
+      if (time >= start && time <= end &&
+          wallTimeFromParts(getDateTimeParts(instant, city.tz)) === targetWallTime) {
+        rows.push({ city, instant, waitMinutes: (time - start) / MINUTE });
       }
     }
-
-    // 依台灣時間排序；若同一時間，維持 CITIES 原始順序。
-    rows.sort((a, b) => a.instant - b.instant);
-
-    const taipeiParts = getDateTimeParts(start, TAIPEI_TZ);
-    queryTimeEl.textContent =
-      `查詢基準：${getDateLabel(taipeiParts)} ${formatTime(taipeiParts.hour, taipeiParts.minute)}（台灣時間）`;
-
-    resultEl.textContent = rows.length
-      ? rows.map(r => r.text).join("\n")
-      : "未找到符合條件的時區資訊。";
-
-    copyBtn.disabled = rows.length === 0;
-  } catch (error) {
-    queryTimeEl.textContent = "";
-    resultEl.textContent = error.message;
-    copyBtn.disabled = true;
   }
+  return rows.sort((a, b) => a.instant - b.instant);
 }
 
-// 預設載入時立即查詢。
-runQuery();
+if (typeof document !== "undefined") {
+  const targetInput = document.getElementById("targetTime");
+  const dateTimeInput = document.getElementById("dateTime");
+  const manualArea = document.getElementById("manualArea");
+  const resultEl = document.getElementById("result");
+  const queryTimeEl = document.getElementById("queryTime");
+  const copyBtn = document.getElementById("copyBtn");
+  const nowText = formatDateTime(new Date(), TAIPEI_TZ).slice(0, 14);
+  targetInput.value = nowText;
+  dateTimeInput.value = nowText;
+  document.querySelectorAll('input[name="mode"]').forEach(input => {
+    input.addEventListener("change", () => {
+      manualArea.classList.toggle("hidden", input.value !== "manual");
+    });
+  });
+  document.getElementById("queryForm").addEventListener("submit", event => {
+    event.preventDefault();
+    try {
+      let target;
+      try { target = parseWallTime(targetInput.value); }
+      catch (error) { throw new Error(`時間 A：${error.message}`); }
+      let queryInstant = new Date();
+      if (document.querySelector('input[name="mode"]:checked').value === "manual") {
+        try { queryInstant = parseTaipeiInput(dateTimeInput.value); }
+        catch (error) { throw new Error(`時間 B：${error.message}`); }
+      }
+      const rows = findMatches(target, queryInstant);
+      queryTimeEl.textContent = `目標 A（各地當地時間）：${targetInput.value.trim()}\n` +
+        `查詢範圍（台灣時間）：${formatDateTime(queryInstant, TAIPEI_TZ)} ～ ${formatDateTime(new Date(queryInstant.getTime() + 60 * MINUTE), TAIPEI_TZ)}（包含兩端）`;
+      resultEl.textContent = rows.length ? rows.map(({ city, instant, waitMinutes }) => {
+        const seconds = Math.round(waitMinutes * 60);
+        const wait = seconds === 0 ? "現在到達 A" : `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒後到達 A`;
+        return `${city.name}（${city.tz}）\n座標：${city.lat.toFixed(6)}, ${city.lon.toFixed(6)}\n` +
+          `B 時刻的當地時間：${formatDateTime(queryInstant, city.tz)}\n` +
+          `${wait}；到達時的台灣時間：${formatDateTime(instant, TAIPEI_TZ)}`;
+      }).join("\n\n") : "未來一小時內，內建城市清單中沒有符合指定日期時間 A 的地點。";
+      copyBtn.disabled = rows.length === 0;
+    } catch (error) {
+      queryTimeEl.textContent = "";
+      resultEl.textContent = error.message;
+      copyBtn.disabled = true;
+    }
+  });
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(resultEl.textContent);
+      copyBtn.textContent = "已複製";
+    } catch {
+      copyBtn.textContent = "複製失敗，請手動選取結果";
+    }
+    setTimeout(() => { copyBtn.textContent = "複製結果"; }, 2000);
+  });
+}
+if (typeof module !== "undefined") {
+  module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime };
+}
