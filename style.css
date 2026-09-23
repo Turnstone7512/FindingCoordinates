@@ -113,7 +113,7 @@ h2 {
   color: #475569;
 }
 
-pre {
+#result {
   margin: 0;
   padding: 18px;
   overflow-x: auto;
@@ -123,7 +123,7 @@ pre {
   font-family: Consolas, "Microsoft JhengHei", monospace;
   font-size: 15px;
   line-height: 1.65;
-  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 600px) {
@@ -143,3 +143,12 @@ pre {
     align-items: flex-start;
   }
 }
+
+.time-group + .time-group { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0; }
+.time-group h3 { margin: 0 0 18px; font-size: 16px; }
+.taipei-hour { color: #b45309; font-weight: 800; }
+.city-result + .city-result { margin-top: 22px; }
+.coordinate-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.coordinates { color: #0369a1; font-weight: 600; }
+button.copy-coordinate { padding: 5px 10px; font-size: 13px; flex-shrink: 0; }
+button:focus-visible { outline: 3px solid #b45309; outline-offset: 3px; }

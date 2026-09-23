@@ -37,21 +37,45 @@ test('DST nonexistent and repeated local times', () => {
 test('seconds preserved: a target just passed is excluded', () => {
   assert.equal(findMatches(parseWallTime('20260923 10:53'), new Date('2026-09-23T01:53:00.001Z'), city('涉谷')).length, 0);
 });
-test('form manual query and validation', () => {
+test('grouped results, coordinate copy, full copy and validation', async () => {
   const fs = require('node:fs');
   const vm = require('node:vm');
+  const copied = [];
+  class Element {
+    constructor() { this.children = []; this.value = ''; this.classList = { toggle() {} }; }
+    set textContent(value) { this.children = [value]; }
+    get textContent() { return this.children.map(c => typeof c === 'string' ? c : c.textContent).join(''); }
+    append(...children) { this.children.push(...children); }
+    replaceChildren() { this.children = []; }
+    setAttribute() {}
+    addEventListener(type, callback) { this[type] = callback; }
+  }
   const elements = new Map();
   for (const id of ['targetTime','dateTime','manualArea','result','queryTime','copyBtn','queryForm']) {
-    elements.set(id, { value: '', textContent: '', classList: { toggle() {} }, addEventListener(type, callback) { this[type] = callback; } });
+    elements.set(id, new Element());
   }
-  const document = { getElementById: id => elements.get(id), querySelectorAll: () => [], querySelector: () => ({ value: 'manual' }) };
-  vm.runInNewContext(fs.readFileSync('app.js','utf8'), { document, Intl, Date, setTimeout });
+  const document = { createElement: () => new Element(), getElementById: id => elements.get(id), querySelectorAll: () => [], querySelector: () => ({ value: 'manual' }) };
+  vm.runInNewContext(fs.readFileSync('app.js','utf8'), { document, Intl, Date, setTimeout: callback => callback(), navigator: { clipboard: { writeText: async text => copied.push(text) } } });
   assert.equal(elements.get('targetTime').value.length, 14);
   elements.get('targetTime').value = '20260923 11:00';
   elements.get('dateTime').value = '20260923 09:53';
   elements.get('queryForm').submit({ preventDefault() {} });
   assert.match(elements.get('result').textContent, /涉谷/);
-  assert.match(elements.get('result').textContent, /7 分 0 秒/);
+  assert.match(elements.get('result').textContent, /台灣時間：20260923 10:00/);
+  elements.get('targetTime').value = '20260923 18:00';
+  elements.get('dateTime').value = '20260923 14:00';
+  elements.get('queryForm').submit({ preventDefault() {} });
+  const groups = elements.get('result').children;
+  assert.equal(groups.length, 2);
+  assert.equal(groups[0].children[0].textContent, '台灣時間：20260923 14:00');
+  assert.equal(groups[1].children[0].textContent, '台灣時間：20260923 15:00');
+  assert.equal(groups[0].children[0].children[1].textContent, '14');
+  assert.equal(groups[0].children.length, 3);
+  const copyCoordinate = groups[0].children[1].children[1].children[1];
+  await copyCoordinate.click();
+  assert.equal(copied[0], '-17.752011, 177.451234');
+  await elements.get('copyBtn').click();
+  assert.equal(copied[1], '台灣時間：20260923 14:00\n\n勞托卡（Pacific/Fiji）\n-17.752011, 177.451234\n\n威靈頓（Pacific/Auckland）\n-41.284212, 174.775681\n\n台灣時間：20260923 15:00\n\n諾美亞（Pacific/Noumea）\n-22.285410, 166.445664');
   assert.equal(elements.get('copyBtn').disabled, false);
   elements.get('dateTime').value = 'invalid';
   elements.get('queryForm').submit({ preventDefault() {} });

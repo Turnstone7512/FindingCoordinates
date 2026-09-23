@@ -103,6 +103,69 @@ function findMatches(targetWallTime, queryInstant, cities = CITIES) {
   return rows.sort((a, b) => a.instant - b.instant);
 }
 
+function renderResults(rows, resultEl) {
+  resultEl.replaceChildren();
+  const groups = new Map();
+  for (const row of rows) {
+    const time = formatDateTime(row.instant, TAIPEI_TZ).slice(0, 14);
+    if (!groups.has(time)) groups.set(time, []);
+    groups.get(time).push(row.city);
+  }
+  const textGroups = [];
+  for (const [time, cities] of groups) {
+    const group = document.createElement("section");
+    group.className = "time-group";
+    const heading = document.createElement("h3");
+    heading.append("台灣時間：" + time.slice(0, 9));
+    const hour = document.createElement("span");
+    hour.className = "taipei-hour";
+    hour.textContent = time.slice(9, 11);
+    heading.append(hour, time.slice(11));
+    group.append(heading);
+    const lines = ["台灣時間：" + time];
+    for (const city of cities) {
+      const entry = document.createElement("div");
+      entry.className = "city-result";
+      const name = document.createElement("div");
+      name.textContent = city.name + "（" + city.tz + "）";
+      const coordinateRow = document.createElement("div");
+      coordinateRow.className = "coordinate-row";
+      const coordinates = city.lat.toFixed(6) + ", " + city.lon.toFixed(6);
+      const value = document.createElement("span");
+      value.className = "coordinates";
+      value.textContent = coordinates;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "copy-coordinate";
+      button.textContent = "複製";
+      button.setAttribute("aria-label", "複製" + city.name + "的座標");
+      button.addEventListener("click", () => copyText(coordinates, button, "複製"));
+      coordinateRow.append(value, button);
+      entry.append(name, coordinateRow);
+      group.append(entry);
+      lines.push(name.textContent + "\n" + coordinates);
+    }
+    resultEl.append(group);
+    textGroups.push(lines.join("\n\n"));
+  }
+  if (!rows.length) resultEl.textContent = "未來一小時內，內建城市清單中沒有符合指定日期時間 A 的地點。";
+  return textGroups.join("\n\n");
+}
+
+async function copyText(text, button, label) {
+  button.disabled = true;
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = "已複製";
+  } catch {
+    button.textContent = "複製失敗，請手動選取";
+  }
+  setTimeout(() => {
+    button.textContent = label;
+    button.disabled = false;
+  }, 2000);
+}
+
 if (typeof document !== "undefined") {
   const targetInput = document.getElementById("targetTime");
   const dateTimeInput = document.getElementById("dateTime");
@@ -110,6 +173,7 @@ if (typeof document !== "undefined") {
   const resultEl = document.getElementById("result");
   const queryTimeEl = document.getElementById("queryTime");
   const copyBtn = document.getElementById("copyBtn");
+  let resultText = "";
   const nowText = formatDateTime(new Date(), TAIPEI_TZ).slice(0, 14);
   targetInput.value = nowText;
   dateTimeInput.value = nowText;
@@ -132,29 +196,16 @@ if (typeof document !== "undefined") {
       const rows = findMatches(target, queryInstant);
       queryTimeEl.textContent = `目標 A（各地當地時間）：${targetInput.value.trim()}\n` +
         `查詢範圍（台灣時間）：${formatDateTime(queryInstant, TAIPEI_TZ)} ～ ${formatDateTime(new Date(queryInstant.getTime() + 60 * MINUTE), TAIPEI_TZ)}（包含兩端）`;
-      resultEl.textContent = rows.length ? rows.map(({ city, instant, waitMinutes }) => {
-        const seconds = Math.round(waitMinutes * 60);
-        const wait = seconds === 0 ? "現在到達 A" : `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒後到達 A`;
-        return `${city.name}（${city.tz}）\n座標：${city.lat.toFixed(6)}, ${city.lon.toFixed(6)}\n` +
-          `B 時刻的當地時間：${formatDateTime(queryInstant, city.tz)}\n` +
-          `${wait}；到達時的台灣時間：${formatDateTime(instant, TAIPEI_TZ)}`;
-      }).join("\n\n") : "未來一小時內，內建城市清單中沒有符合指定日期時間 A 的地點。";
+      resultText = renderResults(rows, resultEl);
       copyBtn.disabled = rows.length === 0;
     } catch (error) {
       queryTimeEl.textContent = "";
+      resultText = "";
       resultEl.textContent = error.message;
       copyBtn.disabled = true;
     }
   });
-  copyBtn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(resultEl.textContent);
-      copyBtn.textContent = "已複製";
-    } catch {
-      copyBtn.textContent = "複製失敗，請手動選取結果";
-    }
-    setTimeout(() => { copyBtn.textContent = "複製結果"; }, 2000);
-  });
+  copyBtn.addEventListener("click", () => copyText(resultText, copyBtn, "複製結果"));
 }
 if (typeof module !== "undefined") {
   module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime };
