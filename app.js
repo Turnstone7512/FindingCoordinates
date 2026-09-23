@@ -238,6 +238,11 @@ if (typeof document !== "undefined") {
     }
     select.value = String(now.hour).padStart(2, "0");
   }
+  const storageStatus = document.getElementById("targetStorageStatus");
+  function showStorageStatus(message) {
+    if (storageStatus) storageStatus.textContent = message;
+  }
+  showStorageStatus("設定 A 後會自動儲存，下次開啟還原。");
   const targetStorageKey = "findingCoordinates.targetTime.v1";
   try {
     const saved = JSON.parse(localStorage.getItem(targetStorageKey));
@@ -245,9 +250,10 @@ if (typeof document !== "undefined") {
       parseWallTime(pickerValue(saved.date, saved.hour));
       targetDate.value = saved.date;
       targetHour.value = saved.hour;
+      showStorageStatus("已還原上次設定：" + pickerValue(saved.date, saved.hour));
     }
   } catch {
-    // Invalid records or unavailable storage must not prevent a query.
+    showStorageStatus("無法讀取上次設定，請重新設定 A；若持續發生，請確認瀏覽器允許此網站儲存資料。");
   }
   function saveTarget() {
     try {
@@ -255,10 +261,13 @@ if (typeof document !== "undefined") {
       localStorage.setItem(targetStorageKey, JSON.stringify({
         date: targetDate.value, hour: targetHour.value
       }));
+      showStorageStatus("已儲存：" + pickerValue(targetDate.value, targetHour.value));
     } catch {
-      // Keep the last valid selection if editing is incomplete or storage is blocked.
+      showStorageStatus("尚未儲存：請確認日期完整，並允許瀏覽器儲存此網站資料。");
     }
   }
+  targetDate.addEventListener("input", saveTarget);
+  targetHour.addEventListener("input", saveTarget);
   targetDate.addEventListener("change", saveTarget);
   targetHour.addEventListener("change", saveTarget);
   function updateMode() {
@@ -287,11 +296,7 @@ if (typeof document !== "undefined") {
         catch (error) { throw new Error(`時間 B：${error.message}`); }
       }
       const { rows, earliest } = queryWithEarliest(target, queryInstant);
-      queryTimeEl.textContent = `目標 A（各地當地時間）：${targetText}\n查詢範圍（台灣時間）：`;
-      appendTaipeiTime(queryTimeEl, formatDateTime(queryInstant, TAIPEI_TZ));
-      queryTimeEl.append(" ～ ");
-      appendTaipeiTime(queryTimeEl, formatDateTime(new Date(queryInstant.getTime() + 60 * MINUTE), TAIPEI_TZ));
-      queryTimeEl.append("（包含兩端）");
+      queryTimeEl.textContent = `目標 A（各地當地時間）：${targetText}`;
       if (earliest) queryTimeEl.append("\nB 早於所有城市到達 A 的時間；以下顯示最早到達的城市（超出一小時範圍）。");
       resultText = renderResults(rows, resultEl);
       copyBtn.disabled = rows.length === 0;

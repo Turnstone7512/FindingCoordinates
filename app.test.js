@@ -135,9 +135,11 @@ test('A selection persists across reloads and tolerates invalid or blocked stora
   const first = open();
   first.get('targetDate').value = '2030-12-25';
   first.get('targetHour').value = '00';
-  first.get('targetDate').change();
+  first.get('targetDate').input();
+  assert.match(first.get('targetStorageStatus').textContent, /已儲存/);
   const second = open();
   assert.equal(second.get('targetDate').value, '2030-12-25');
+  assert.match(second.get('targetStorageStatus').textContent, /已還原/);
   assert.equal(second.get('targetHour').value, '00');
   second.get('targetHour').value = '23';
   second.get('targetHour').change();
@@ -151,4 +153,5 @@ test('A selection persists across reloads and tolerates invalid or blocked stora
   }
   const blocked = open({ getItem() { throw Error('blocked'); }, setItem() { throw Error('blocked'); } });
   assert.doesNotThrow(() => blocked.get('targetHour').change());
+  assert.match(blocked.get('targetStorageStatus').textContent, /尚未儲存/);
 });
