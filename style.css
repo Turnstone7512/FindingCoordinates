@@ -152,3 +152,9 @@ h2 {
 .coordinates { color: #0369a1; font-weight: 600; }
 button.copy-coordinate { padding: 5px 10px; font-size: 13px; flex-shrink: 0; }
 button:focus-visible { outline: 3px solid #b45309; outline-offset: 3px; }
+
+.date-hour-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.date-hour-controls label { display: flex; flex-direction: column; gap: 7px; }
+.date-hour-controls input { width: 190px; max-width: 100%; min-height: 44px; }
+.date-hour-controls select { min-height: 44px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; color: #1f2937; font-size: 16px; }
+.fixed-minute { padding-bottom: 11px; white-space: nowrap; }

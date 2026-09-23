@@ -103,6 +103,45 @@ function findMatches(targetWallTime, queryInstant, cities = CITIES) {
   return rows.sort((a, b) => a.instant - b.instant);
 }
 
+// Resolve A near its own date, even when B is many days earlier.
+function queryWithEarliest(targetWallTime, queryInstant, cities = CITIES) {
+  const matches = findMatches(targetWallTime, queryInstant, cities);
+  if (matches.length) return { rows: matches, earliest: false };
+  const candidates = [];
+  for (const city of cities) {
+    const offsets = new Set();
+    // Covers UTC offsets and both sides of a nearby daylight-saving transition.
+    for (let hour = -36; hour <= 36; hour++) {
+      const sample = targetWallTime + hour * 60 * MINUTE;
+      offsets.add(wallTimeFromParts(getDateTimeParts(new Date(sample), city.tz)) - sample);
+    }
+    for (const offset of offsets) {
+      const instant = new Date(targetWallTime - offset);
+      if (wallTimeFromParts(getDateTimeParts(instant, city.tz)) === targetWallTime) {
+        candidates.push({ city, instant, waitMinutes: (instant - queryInstant) / MINUTE });
+      }
+    }
+  }
+  candidates.sort((a, b) => a.instant - b.instant);
+  const first = candidates[0];
+  if (first && queryInstant < first.instant) {
+    return { rows: candidates.filter(row => row.instant.getTime() === first.instant.getTime()), earliest: true };
+  }
+  return { rows: [], earliest: false };
+}
+
+function appendTaipeiTime(element, time) {
+  element.append(time.slice(0, 9));
+  const hour = document.createElement("span");
+  hour.className = "taipei-hour";
+  hour.textContent = time.slice(9, 11);
+  element.append(hour, ":");
+  const minute = document.createElement("span");
+  if (time.slice(12, 14) !== "00") minute.className = "taipei-hour";
+  minute.textContent = time.slice(12, 14);
+  element.append(minute, time.slice(14));
+}
+
 function renderResults(rows, resultEl) {
   resultEl.replaceChildren();
   const groups = new Map();
@@ -120,7 +159,11 @@ function renderResults(rows, resultEl) {
     const hour = document.createElement("span");
     hour.className = "taipei-hour";
     hour.textContent = time.slice(9, 11);
-    heading.append(hour, time.slice(11));
+    heading.append(hour, ":");
+    const minute = document.createElement("span");
+    if (time.slice(12, 14) !== "00") minute.className = "taipei-hour";
+    minute.textContent = time.slice(12, 14);
+    heading.append(minute);
     group.append(heading);
     const lines = ["台灣時間：" + time];
     for (const city of cities) {
@@ -166,36 +209,90 @@ async function copyText(text, button, label) {
   }, 2000);
 }
 
+function pickerValue(date, hour) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^(?:[01]\d|2[0-3])$/.test(hour)) {
+    throw new Error("請選擇有效日期及 0～23 小時。");
+  }
+  return date.replaceAll("-", "") + " " + hour + ":00";
+}
+
 if (typeof document !== "undefined") {
-  const targetInput = document.getElementById("targetTime");
-  const dateTimeInput = document.getElementById("dateTime");
+  const targetDate = document.getElementById("targetDate");
+  const targetHour = document.getElementById("targetHour");
+  const manualDate = document.getElementById("manualDate");
+  const manualHour = document.getElementById("manualHour");
   const manualArea = document.getElementById("manualArea");
   const resultEl = document.getElementById("result");
   const queryTimeEl = document.getElementById("queryTime");
   const copyBtn = document.getElementById("copyBtn");
   let resultText = "";
-  const nowText = formatDateTime(new Date(), TAIPEI_TZ).slice(0, 14);
-  targetInput.value = nowText;
-  dateTimeInput.value = nowText;
+  const now = getDateTimeParts(new Date(), TAIPEI_TZ);
+  const date = String(now.year).padStart(4, "0") + "-" + String(now.month).padStart(2, "0") + "-" + String(now.day).padStart(2, "0");
+  targetDate.value = manualDate.value = date;
+  for (const select of [targetHour, manualHour]) {
+    for (let hour = 0; hour < 24; hour++) {
+      const option = document.createElement("option");
+      option.value = String(hour).padStart(2, "0");
+      option.textContent = String(hour);
+      select.append(option);
+    }
+    select.value = String(now.hour).padStart(2, "0");
+  }
+  const targetStorageKey = "findingCoordinates.targetTime.v1";
+  try {
+    const saved = JSON.parse(localStorage.getItem(targetStorageKey));
+    if (saved) {
+      parseWallTime(pickerValue(saved.date, saved.hour));
+      targetDate.value = saved.date;
+      targetHour.value = saved.hour;
+    }
+  } catch {
+    // Invalid records or unavailable storage must not prevent a query.
+  }
+  function saveTarget() {
+    try {
+      parseWallTime(pickerValue(targetDate.value, targetHour.value));
+      localStorage.setItem(targetStorageKey, JSON.stringify({
+        date: targetDate.value, hour: targetHour.value
+      }));
+    } catch {
+      // Keep the last valid selection if editing is incomplete or storage is blocked.
+    }
+  }
+  targetDate.addEventListener("change", saveTarget);
+  targetHour.addEventListener("change", saveTarget);
+  function updateMode() {
+    const manual = document.querySelector('input[name="mode"]:checked').value === "manual";
+    manualArea.classList.toggle("hidden", !manual);
+    manualDate.disabled = manualHour.disabled = !manual;
+  }
   document.querySelectorAll('input[name="mode"]').forEach(input => {
-    input.addEventListener("change", () => {
-      manualArea.classList.toggle("hidden", input.value !== "manual");
-    });
+    input.addEventListener("change", updateMode);
   });
+  updateMode();
   document.getElementById("queryForm").addEventListener("submit", event => {
     event.preventDefault();
     try {
       let target;
-      try { target = parseWallTime(targetInput.value); }
+      let targetText;
+      try {
+        targetText = pickerValue(targetDate.value, targetHour.value);
+        target = parseWallTime(targetText);
+        saveTarget();
+      }
       catch (error) { throw new Error(`時間 A：${error.message}`); }
       let queryInstant = new Date();
       if (document.querySelector('input[name="mode"]:checked').value === "manual") {
-        try { queryInstant = parseTaipeiInput(dateTimeInput.value); }
+        try { queryInstant = parseTaipeiInput(pickerValue(manualDate.value, manualHour.value)); }
         catch (error) { throw new Error(`時間 B：${error.message}`); }
       }
-      const rows = findMatches(target, queryInstant);
-      queryTimeEl.textContent = `目標 A（各地當地時間）：${targetInput.value.trim()}\n` +
-        `查詢範圍（台灣時間）：${formatDateTime(queryInstant, TAIPEI_TZ)} ～ ${formatDateTime(new Date(queryInstant.getTime() + 60 * MINUTE), TAIPEI_TZ)}（包含兩端）`;
+      const { rows, earliest } = queryWithEarliest(target, queryInstant);
+      queryTimeEl.textContent = `目標 A（各地當地時間）：${targetText}\n查詢範圍（台灣時間）：`;
+      appendTaipeiTime(queryTimeEl, formatDateTime(queryInstant, TAIPEI_TZ));
+      queryTimeEl.append(" ～ ");
+      appendTaipeiTime(queryTimeEl, formatDateTime(new Date(queryInstant.getTime() + 60 * MINUTE), TAIPEI_TZ));
+      queryTimeEl.append("（包含兩端）");
+      if (earliest) queryTimeEl.append("\nB 早於所有城市到達 A 的時間；以下顯示最早到達的城市（超出一小時範圍）。");
       resultText = renderResults(rows, resultEl);
       copyBtn.disabled = rows.length === 0;
     } catch (error) {
@@ -208,5 +305,5 @@ if (typeof document !== "undefined") {
   copyBtn.addEventListener("click", () => copyText(resultText, copyBtn, "複製結果"));
 }
 if (typeof module !== "undefined") {
-  module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime };
+  module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime, queryWithEarliest };
 }

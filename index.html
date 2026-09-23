@@ -16,9 +16,13 @@
     <section class="card">
       <form id="queryForm">
       <div class="manual-area">
-        <label for="targetTime">指定時間 A（各城市當地日期時間）</label>
-        <input id="targetTime" type="text" placeholder="20260923 11:00" maxlength="14" required>
-        <small>格式：YYYYMMDD HH:MM。比對完整日期，包含 B 到 B＋60 分鐘。</small>
+        <span>指定時間 A（各城市當地日期時間）</span>
+        <div class="date-hour-controls">
+          <label>日期 <input id="targetDate" type="date" min="0001-01-01" max="9999-12-31" required></label>
+          <label>小時 <select id="targetHour" required></select></label>
+          <span class="fixed-minute">：00 分</span>
+        </div>
+        <small>使用日曆選擇日期，小時為 0～23，分鐘固定為 00。</small>
       </div>
       <div class="mode">
         <label>
@@ -32,14 +36,18 @@
       </div>
 
       <div id="manualArea" class="manual-area hidden">
-        <label for="dateTime">時間 B（台灣時間 UTC+8）</label>
-        <input id="dateTime" type="text" placeholder="20260923 09:53" maxlength="14">
-        <small>格式：YYYYMMDD HH:MM，例如 20260923 09:53</small>
+        <span>時間 B（台灣時間 UTC+8）</span>
+        <div class="date-hour-controls">
+          <label>日期 <input id="manualDate" type="date" min="0001-01-01" max="9999-12-31" required disabled></label>
+          <label>小時 <select id="manualHour" required disabled></select></label>
+          <span class="fixed-minute">：00 分</span>
+        </div>
+        <small>使用日曆選擇日期，小時為 0～23，分鐘固定為 00。</small>
       </div>
 
       <button id="queryBtn" type="submit">查詢</button>
       </form>
-      <p><small>查詢內建城市清單；各城市時區依查詢日期套用夏令時間。</small></p>
+      <p><small>查詢內建城市清單，依日期套用夏令時間。若 B 早於所有城市且一小時內無結果，顯示最早到達 A 的城市與台灣時間。</small></p>
     </section>
 
     <section class="card">
