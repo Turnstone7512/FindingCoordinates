@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finding Coordinates</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Finding Coordinates</h1>
+      <p>依台灣時間查詢未來一小時內開始的時區資訊與座標</p>
+    </header>
+
+    <section class="card">
+      <div class="mode">
+        <label>
+          <input type="radio" name="mode" value="now" checked>
+          使用目前台灣時間
+        </label>
+        <label>
+          <input type="radio" name="mode" value="manual">
+          手動輸入日期時間
+        </label>
+      </div>
+
+      <div id="manualArea" class="manual-area hidden">
+        <label for="dateTime">日期時間</label>
+        <input id="dateTime" type="text" placeholder="20260731 15:30" maxlength="13">
+        <small>格式：YYYYMMDD HH:MM，例如 20260731 15:30</small>
+      </div>
+
+      <button id="queryBtn">查詢</button>
+    </section>
+
+    <section class="card">
+      <div class="result-header">
+        <h2>查詢結果</h2>
+        <button id="copyBtn" class="secondary" disabled>複製結果</button>
+      </div>
+      <div id="queryTime" class="query-time"></div>
+      <pre id="result">請輸入條件後按「查詢」。</pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
