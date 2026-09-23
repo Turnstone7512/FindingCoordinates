@@ -51,10 +51,10 @@ test('grouped results, coordinate copy, full copy and validation', async () => {
     addEventListener(type, callback) { this[type] = callback; }
   }
   const elements = new Map();
-  for (const id of ['targetDate','targetHour','manualDate','manualHour','manualArea','result','queryTime','copyBtn','queryForm']) {
+  for (const id of ['targetDate','targetHour','targetList','manualDate','manualHour','manualArea','result','queryTime','copyBtn','queryForm']) {
     elements.set(id, new Element());
   }
-  const document = { createElement: () => new Element(), getElementById: id => elements.get(id), querySelectorAll: () => [], querySelector: () => ({ value: 'manual' }) };
+  const document = { createElement: () => { const el = new Element(); Object.defineProperty(el, "id", { set(id) { elements.set(id, el); } }); return el; }, getElementById: id => elements.get(id), querySelectorAll: () => [], querySelector: () => ({ value: 'manual' }) };
   vm.runInNewContext(fs.readFileSync('app.js','utf8'), { document, Intl, Date, setTimeout: callback => callback(), navigator: { clipboard: { writeText: async text => copied.push(text) } } });
   assert.equal(elements.get('targetDate').value.length, 10);
   assert.equal(elements.get('targetHour').children.length, 24);
@@ -115,43 +115,60 @@ test('normal window and already-passed targets do not trigger fallback', () => {
   assert.equal(gap.rows.length, 0);
   assert.equal(gap.earliest, false);
 });
-test('A selection persists across reloads and tolerates invalid or blocked storage', () => {
+test('multiple A rows persist, migrate, add to five, delete and report blocked storage', () => {
   const vm = require('node:vm');
   const source = require('node:fs').readFileSync('app.js', 'utf8');
   const values = new Map();
+  const key = 'findingCoordinates.targetTimes.v2';
   const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
   function open(localStorage = storage) {
     const elements = new Map();
-    const document = {
-      getElementById(id) {
-        if (!elements.has(id)) elements.set(id, { value: '', append() {}, classList: { toggle() {} }, addEventListener(event, handler) { this[event] = handler; } });
-        return elements.get(id);
-      },
-      createElement: () => ({}), querySelectorAll: () => [], querySelector: () => ({ value: 'now' })
-    };
+    function element() {
+      const el = { value: '', children: [], append(...children) { this.children.push(...children); }, replaceChildren() { this.children = []; }, setAttribute() {}, classList: { toggle() {} }, addEventListener(event, handler) { this[event] = handler; } };
+      Object.defineProperty(el, 'id', { set(id) { elements.set(id, el); } });
+      return el;
+    }
+    const document = { getElementById(id) { if (!elements.has(id)) elements.set(id, element()); return elements.get(id); }, createElement: element, querySelectorAll: () => [], querySelector: () => ({ value: 'now' }) };
     vm.runInNewContext(source, { document, localStorage, Date, Intl });
     return elements;
   }
+  values.set('findingCoordinates.targetTime.v1', JSON.stringify({ date: '2030-12-25', hour: '00' }));
   const first = open();
-  first.get('targetDate').value = '2030-12-25';
-  first.get('targetHour').value = '00';
-  first.get('targetDate').input();
-  assert.match(first.get('targetStorageStatus').textContent, /已儲存/);
-  const second = open();
-  assert.equal(second.get('targetDate').value, '2030-12-25');
-  assert.match(second.get('targetStorageStatus').textContent, /已還原/);
-  assert.equal(second.get('targetHour').value, '00');
-  second.get('targetHour').value = '23';
-  second.get('targetHour').change();
-  assert.equal(open().get('targetHour').value, '23');
-  second.get('targetDate').value = '';
-  second.get('targetDate').change();
-  assert.equal(open().get('targetDate').value, '2030-12-25');
-  for (const value of ['not json', '{"date":"2030-02-30","hour":"23"}']) {
-    values.set('findingCoordinates.targetTime.v1', value);
-    assert.notEqual(open().get('targetDate').value, '2030-02-30');
+  assert.equal(first.get('targetDate').value, '2030-12-25');
+  for (let count = 1; count < 5; count++) {
+    const rows = first.get('targetList').children;
+    assert.equal(rows.length, count);
+    const buttons = rows.flatMap(row => row.children).filter(el => el.textContent === '+');
+    assert.equal(buttons.length, 1);
+    buttons[0].click();
+    first.get('targetHour' + count).value = String(count).padStart(2, '0');
+    first.get('targetHour' + count).input();
   }
+  assert.equal(first.get('targetList').children.flatMap(row => row.children).filter(el => el.textContent === '+').length, 0);
+  assert.equal(JSON.parse(values.get(key)).length, 5);
+  const restored = open();
+  assert.equal(restored.get('targetList').children.length, 5);
+  assert.equal(restored.get('targetHour4').value, '04');
+  restored.get('targetList').children[0].children.find(el => el.textContent === '×').click();
+  assert.equal(restored.get('targetHour').value, '01');
+  assert.equal(open().get('targetList').children.length, 4);
+  while (restored.get('targetList').children.length > 1) restored.get('targetList').children[0].children.find(el => el.textContent === '×').click();
+  assert.equal(restored.get('targetList').children[0].children.filter(el => el.textContent === '×').length, 0);
+  restored.get('targetDate').value = ''; restored.get('targetDate').change();
+  assert.equal(open().get('targetDate').value, '2030-12-25');
+  values.set(key, 'invalid JSON');
+  assert.match(open().get('targetStorageStatus').textContent, /無法讀取/);
   const blocked = open({ getItem() { throw Error('blocked'); }, setItem() { throw Error('blocked'); } });
-  assert.doesNotThrow(() => blocked.get('targetHour').change());
+  blocked.get('targetHour').change();
   assert.match(blocked.get('targetStorageStatus').textContent, /尚未儲存/);
+});
+
+test('next A uses Taiwan B, skips past entries, sorts inputs and includes equality', () => {
+  const { selectNextTarget } = require('./app');
+  const targets = [ { date: '2026-09-23', hour: '18' }, { date: '2026-09-23', hour: '09' }, { date: '2026-09-23', hour: '14' } ];
+  assert.equal(selectNextTarget(targets, parseTaipeiInput('20260923 10:00')).index, 2);
+  assert.equal(selectNextTarget(targets, parseTaipeiInput('20260923 14:00')).index, 2);
+  assert.equal(selectNextTarget(targets, new Date('2026-09-23T06:00:00.001Z')).index, 0);
+  assert.equal(selectNextTarget(targets, parseTaipeiInput('20260924 00:00')), null);
+  assert.throws(() => selectNextTarget([{ date: '', hour: '00' }], new Date()), /A1/);
 });

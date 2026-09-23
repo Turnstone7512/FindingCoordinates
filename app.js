@@ -216,60 +216,115 @@ function pickerValue(date, hour) {
   return date.replaceAll("-", "") + " " + hour + ":00";
 }
 
+function selectNextTarget(targets, queryInstant) {
+  const b = wallTimeFromParts(getDateTimeParts(queryInstant, TAIPEI_TZ)) + queryInstant.getUTCMilliseconds();
+  return targets.map((value, index) => {
+    try {
+      const text = pickerValue(value.date, value.hour);
+      return { index, text, time: parseWallTime(text) };
+    } catch { throw new Error("時間 A" + (index + 1) + "：請選擇有效日期與小時。"); }
+  }).filter(value => value.time >= b).sort((a, b) => a.time - b.time || a.index - b.index)[0] || null;
+}
+
 if (typeof document !== "undefined") {
-  const targetDate = document.getElementById("targetDate");
-  const targetHour = document.getElementById("targetHour");
   const manualDate = document.getElementById("manualDate");
   const manualHour = document.getElementById("manualHour");
   const manualArea = document.getElementById("manualArea");
   const resultEl = document.getElementById("result");
   const queryTimeEl = document.getElementById("queryTime");
   const copyBtn = document.getElementById("copyBtn");
+  const targetList = document.getElementById("targetList");
+  const storageStatus = document.getElementById("targetStorageStatus");
   let resultText = "";
   const now = getDateTimeParts(new Date(), TAIPEI_TZ);
   const date = String(now.year).padStart(4, "0") + "-" + String(now.month).padStart(2, "0") + "-" + String(now.day).padStart(2, "0");
-  targetDate.value = manualDate.value = date;
-  for (const select of [targetHour, manualHour]) {
-    for (let hour = 0; hour < 24; hour++) {
+  const initial = { date, hour: String(now.hour).padStart(2, "0") };
+  manualDate.value = date;
+  function fillHours(select, hour) {
+    for (let value = 0; value < 24; value++) {
       const option = document.createElement("option");
-      option.value = String(hour).padStart(2, "0");
-      option.textContent = String(hour);
+      option.value = String(value).padStart(2, "0");
+      option.textContent = String(value);
       select.append(option);
     }
-    select.value = String(now.hour).padStart(2, "0");
+    select.value = hour;
   }
-  const storageStatus = document.getElementById("targetStorageStatus");
-  function showStorageStatus(message) {
-    if (storageStatus) storageStatus.textContent = message;
+  fillHours(manualHour, initial.hour);
+  const targetStorageKey = "findingCoordinates.targetTimes.v2";
+  let targets = [{ ...initial }];
+  let controls = [];
+  function showStorageStatus(message) { if (storageStatus) storageStatus.textContent = message; }
+  function validateTargets(values) {
+    if (!Array.isArray(values) || values.length < 1 || values.length > 5) throw new Error("Invalid targets");
+    values.forEach(value => parseWallTime(pickerValue(value.date, value.hour)));
   }
   showStorageStatus("設定 A 後會自動儲存，下次開啟還原。");
-  const targetStorageKey = "findingCoordinates.targetTime.v1";
   try {
-    const saved = JSON.parse(localStorage.getItem(targetStorageKey));
+    const current = localStorage.getItem(targetStorageKey);
+    const legacy = current === null ? JSON.parse(localStorage.getItem("findingCoordinates.targetTime.v1")) : null;
+    const saved = current !== null ? JSON.parse(current) : legacy ? [legacy] : null;
     if (saved) {
-      parseWallTime(pickerValue(saved.date, saved.hour));
-      targetDate.value = saved.date;
-      targetHour.value = saved.hour;
-      showStorageStatus("已還原上次設定：" + pickerValue(saved.date, saved.hour));
+      validateTargets(saved);
+      targets = saved;
+      showStorageStatus("已還原上次設定，共 " + targets.length + " 組時間。");
     }
-  } catch {
-    showStorageStatus("無法讀取上次設定，請重新設定 A；若持續發生，請確認瀏覽器允許此網站儲存資料。");
+  } catch { showStorageStatus("無法讀取上次設定，請重新設定 A，並確認瀏覽器允許儲存資料。"); }
+  function readTargets() {
+    targets = controls.map(control => ({ date: control.date.value, hour: control.hour.value }));
   }
   function saveTarget() {
+    readTargets();
     try {
-      parseWallTime(pickerValue(targetDate.value, targetHour.value));
-      localStorage.setItem(targetStorageKey, JSON.stringify({
-        date: targetDate.value, hour: targetHour.value
-      }));
-      showStorageStatus("已儲存：" + pickerValue(targetDate.value, targetHour.value));
-    } catch {
-      showStorageStatus("尚未儲存：請確認日期完整，並允許瀏覽器儲存此網站資料。");
-    }
+      validateTargets(targets);
+      localStorage.setItem(targetStorageKey, JSON.stringify(targets));
+      showStorageStatus("已儲存 " + targets.length + " 組時間：" + targets.map((v, i) => "A" + (i + 1) + " " + pickerValue(v.date, v.hour)).join("；"));
+    } catch { showStorageStatus("尚未儲存：請確認每組日期完整，並允許瀏覽器儲存此網站資料。"); }
   }
-  targetDate.addEventListener("input", saveTarget);
-  targetHour.addEventListener("input", saveTarget);
-  targetDate.addEventListener("change", saveTarget);
-  targetHour.addEventListener("change", saveTarget);
+  function renderTargets() {
+    targetList.replaceChildren();
+    controls = [];
+    targets.forEach((target, index) => {
+      const row = document.createElement("div");
+      row.className = "date-hour-controls target-row";
+      const name = document.createElement("strong");
+      name.textContent = "A" + (index + 1);
+      const dateLabel = document.createElement("label");
+      dateLabel.append("日期");
+      const dateInput = document.createElement("input");
+      dateInput.type = "date"; dateInput.min = "0001-01-01"; dateInput.max = "9999-12-31";
+      dateInput.required = true; dateInput.value = target.date;
+      dateInput.id = "targetDate" + (index || "");
+      dateInput.setAttribute("aria-label", name.textContent + " 日期");
+      dateLabel.append(dateInput);
+      const hourLabel = document.createElement("label"); hourLabel.append("小時");
+      const hourInput = document.createElement("select"); hourInput.required = true;
+      hourInput.id = "targetHour" + (index || "");
+      hourInput.setAttribute("aria-label", name.textContent + " 小時");
+      fillHours(hourInput, target.hour); hourLabel.append(hourInput);
+      controls.push({ date: dateInput, hour: hourInput });
+      for (const input of [dateInput, hourInput]) {
+        input.addEventListener("input", saveTarget); input.addEventListener("change", saveTarget);
+      }
+      const minute = document.createElement("span"); minute.className = "fixed-minute"; minute.textContent = "：00 分";
+      row.append(name, dateLabel, hourLabel, minute);
+      if (index === targets.length - 1 && targets.length < 5) {
+        const add = document.createElement("button"); add.type = "button"; add.textContent = "+";
+        add.setAttribute("aria-label", "新增時間 A" + (targets.length + 1));
+        add.addEventListener("click", () => {
+          readTargets(); targets.push({ ...targets[targets.length - 1] }); renderTargets(); saveTarget();
+        });
+        row.append(add);
+      }
+      if (targets.length > 1) {
+        const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "×";
+        remove.className = "remove-target"; remove.setAttribute("aria-label", "刪除時間 " + name.textContent);
+        remove.addEventListener("click", () => { readTargets(); targets.splice(index, 1); renderTargets(); saveTarget(); });
+        row.append(remove);
+      }
+      targetList.append(row);
+    });
+  }
+  renderTargets();
   function updateMode() {
     const manual = document.querySelector('input[name="mode"]:checked').value === "manual";
     manualArea.classList.toggle("hidden", !manual);
@@ -282,21 +337,21 @@ if (typeof document !== "undefined") {
   document.getElementById("queryForm").addEventListener("submit", event => {
     event.preventDefault();
     try {
-      let target;
-      let targetText;
-      try {
-        targetText = pickerValue(targetDate.value, targetHour.value);
-        target = parseWallTime(targetText);
-        saveTarget();
-      }
-      catch (error) { throw new Error(`時間 A：${error.message}`); }
       let queryInstant = new Date();
       if (document.querySelector('input[name="mode"]:checked').value === "manual") {
         try { queryInstant = parseTaipeiInput(pickerValue(manualDate.value, manualHour.value)); }
         catch (error) { throw new Error(`時間 B：${error.message}`); }
       }
-      const { rows, earliest } = queryWithEarliest(target, queryInstant);
-      queryTimeEl.textContent = `目標 A（各地當地時間）：${targetText}`;
+      readTargets();
+      const next = selectNextTarget(targets, queryInstant);
+      saveTarget();
+      if (!next) {
+        queryTimeEl.textContent = ""; resultText = "";
+        resultEl.textContent = "A時間已過"; copyBtn.disabled = true;
+        return;
+      }
+      const { rows, earliest } = queryWithEarliest(next.time, queryInstant);
+      queryTimeEl.textContent = `目標 A${next.index + 1}（各地當地時間）：${next.text}`;
       if (earliest) queryTimeEl.append("\nB 早於所有城市到達 A 的時間；以下顯示最早到達的城市（超出一小時範圍）。");
       resultText = renderResults(rows, resultEl);
       copyBtn.disabled = rows.length === 0;
@@ -310,5 +365,5 @@ if (typeof document !== "undefined") {
   copyBtn.addEventListener("click", () => copyText(resultText, copyBtn, "複製結果"));
 }
 if (typeof module !== "undefined") {
-  module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime, queryWithEarliest };
+  module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime, queryWithEarliest, selectNextTarget };
 }

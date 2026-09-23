@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finding Coordinates</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260923-multi-4">
 </head>
 <body>
   <main class="container">
@@ -17,12 +17,8 @@
       <form id="queryForm">
       <div class="manual-area">
         <span>指定時間 A（各城市當地日期時間）</span>
-        <div class="date-hour-controls">
-          <label>日期 <input id="targetDate" type="date" min="0001-01-01" max="9999-12-31" required></label>
-          <label>小時 <select id="targetHour" required></select></label>
-          <span class="fixed-minute">：00 分</span>
-        </div>
-        <small>使用日曆選擇日期，小時為 0～23，分鐘固定為 00。</small>
+        <div id="targetList"></div>
+        <small>最多 5 組，分鐘固定 00。只查詢不早於 B 的最近一組 A；全部早於 B 時顯示「A時間已過」。</small>
       </div>
       <p id="targetStorageStatus" role="status" aria-live="polite"></p>
       <div class="mode">
@@ -61,6 +57,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260923-results-3"></script>
+  <script src="app.js?v=20260923-multi-4"></script>
 </body>
 </html>

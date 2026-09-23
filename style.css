@@ -158,3 +158,8 @@ button:focus-visible { outline: 3px solid #b45309; outline-offset: 3px; }
 .date-hour-controls input { width: 190px; max-width: 100%; min-height: 44px; }
 .date-hour-controls select { min-height: 44px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; color: #1f2937; font-size: 16px; }
 .fixed-minute { padding-bottom: 11px; white-space: nowrap; }
+
+.target-row + .target-row { margin-top: 16px; }
+.target-row > strong { padding-bottom: 11px; }
+.target-row > button { min-width: 44px; min-height: 44px; padding: 8px; }
+button.remove-target { background: #b91c1c; }
