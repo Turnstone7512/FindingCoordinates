@@ -157,9 +157,30 @@ button:focus-visible { outline: 3px solid #b45309; outline-offset: 3px; }
 .date-hour-controls label { display: flex; flex-direction: column; gap: 7px; }
 .date-hour-controls input { width: 190px; max-width: 100%; min-height: 44px; }
 .date-hour-controls select { min-height: 44px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; color: #1f2937; font-size: 16px; }
-.fixed-minute { padding-bottom: 11px; white-space: nowrap; }
 
 .target-row + .target-row { margin-top: 16px; }
 .target-row > strong { padding-bottom: 11px; }
 .target-row > button { min-width: 44px; min-height: 44px; padding: 8px; }
 button.remove-target { background: #b91c1c; }
+
+#targetStorageStatus { font-size: 12px; line-height: 1.5; color: #64748b; margin: 8px 0 16px; }
+@media (max-width: 600px) {
+  .target-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 70px 36px 36px; align-items: center; gap: 4px; }
+  .target-row + .target-row { margin-top: 10px; }
+  .target-row > strong { padding: 0; font-size: 14px; }
+  .target-row label { min-width: 0; gap: 0; }
+  .target-row .target-date input { width: 100%; min-width: 0; max-width: 100%; height: 40px; min-height: 40px; padding: 4px; background: white; color: #1f2937; }
+  .target-date input::-webkit-date-and-time-value { text-align: left; min-width: 0; }
+  .target-row select { width: 100%; padding: 4px 2px; min-height: 40px; height: 40px; }
+  .target-row > button { min-width: 36px; width: 36px; min-height: 40px; padding: 0; font-size: 20px; }
+  .target-row .add-target { grid-column: 4; }
+  .target-row .remove-target { grid-column: 5; }
+  .manual-area > small { font-size: 11px; line-height: 1.5; }
+}
+@media (max-width: 439px) {
+  .target-row { grid-template-columns: 24px minmax(0, 1fr) 70px 36px 36px; row-gap: 5px; }
+  .target-row .target-date { grid-column: 2 / -1; grid-row: 1; max-width: 180px; }
+  .target-row .target-hour { grid-column: 2; grid-row: 2; width: 70px; }
+  .target-row > button { grid-row: 2; }
+  .target-row + .target-row { border-top: 1px solid #e2e8f0; padding-top: 10px; }
+}

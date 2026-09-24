@@ -244,7 +244,7 @@ if (typeof document !== "undefined") {
     for (let value = 0; value < 24; value++) {
       const option = document.createElement("option");
       option.value = String(value).padStart(2, "0");
-      option.textContent = String(value);
+      option.textContent = String(value) + "時";
       select.append(option);
     }
     select.value = hour;
@@ -277,7 +277,7 @@ if (typeof document !== "undefined") {
     try {
       validateTargets(targets);
       localStorage.setItem(targetStorageKey, JSON.stringify(targets));
-      showStorageStatus("已儲存 " + targets.length + " 組時間：" + targets.map((v, i) => "A" + (i + 1) + " " + pickerValue(v.date, v.hour)).join("；"));
+      showStorageStatus("已儲存 " + targets.length + " 組時間，下次開啟自動還原。");
     } catch { showStorageStatus("尚未儲存：請確認每組日期完整，並允許瀏覽器儲存此網站資料。"); }
   }
   function renderTargets() {
@@ -289,14 +289,14 @@ if (typeof document !== "undefined") {
       const name = document.createElement("strong");
       name.textContent = "A" + (index + 1);
       const dateLabel = document.createElement("label");
-      dateLabel.append("日期");
+      dateLabel.className = "target-date";
       const dateInput = document.createElement("input");
       dateInput.type = "date"; dateInput.min = "0001-01-01"; dateInput.max = "9999-12-31";
       dateInput.required = true; dateInput.value = target.date;
       dateInput.id = "targetDate" + (index || "");
       dateInput.setAttribute("aria-label", name.textContent + " 日期");
       dateLabel.append(dateInput);
-      const hourLabel = document.createElement("label"); hourLabel.append("小時");
+      const hourLabel = document.createElement("label"); hourLabel.className = "target-hour";
       const hourInput = document.createElement("select"); hourInput.required = true;
       hourInput.id = "targetHour" + (index || "");
       hourInput.setAttribute("aria-label", name.textContent + " 小時");
@@ -305,10 +305,9 @@ if (typeof document !== "undefined") {
       for (const input of [dateInput, hourInput]) {
         input.addEventListener("input", saveTarget); input.addEventListener("change", saveTarget);
       }
-      const minute = document.createElement("span"); minute.className = "fixed-minute"; minute.textContent = "：00 分";
-      row.append(name, dateLabel, hourLabel, minute);
+      row.append(name, dateLabel, hourLabel);
       if (index === targets.length - 1 && targets.length < 5) {
-        const add = document.createElement("button"); add.type = "button"; add.textContent = "+";
+        const add = document.createElement("button"); add.type = "button"; add.className = "add-target"; add.textContent = "+";
         add.setAttribute("aria-label", "新增時間 A" + (targets.length + 1));
         add.addEventListener("click", () => {
           readTargets(); targets.push({ ...targets[targets.length - 1] }); renderTargets(); saveTarget();

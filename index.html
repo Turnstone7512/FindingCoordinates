@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finding Coordinates</title>
-  <link rel="stylesheet" href="style.css?v=20260923-multi-4">
+  <link rel="stylesheet" href="style.css?v=20260924-hour-6">
 </head>
 <body>
   <main class="container">
@@ -35,9 +35,8 @@
       <div id="manualArea" class="manual-area hidden">
         <span>時間 B（台灣時間 UTC+8）</span>
         <div class="date-hour-controls">
-          <label>日期 <input id="manualDate" type="date" min="0001-01-01" max="9999-12-31" required disabled></label>
-          <label>小時 <select id="manualHour" required disabled></select></label>
-          <span class="fixed-minute">：00 分</span>
+          <label><input aria-label="時間 B 日期" id="manualDate" type="date" min="0001-01-01" max="9999-12-31" required disabled></label>
+          <label><select aria-label="時間 B 小時" id="manualHour" required disabled></select></label>
         </div>
         <small>使用日曆選擇日期，小時為 0～23，分鐘固定為 00。</small>
       </div>
@@ -57,6 +56,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260923-multi-4"></script>
+  <script src="app.js?v=20260924-hour-6"></script>
 </body>
 </html>
