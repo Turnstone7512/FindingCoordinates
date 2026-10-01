@@ -80,8 +80,8 @@ function formatDateTime(date, timeZone) {
 }
 
 function findMatches(targetWallTime, queryInstant, cities = CITIES) {
-  const start = queryInstant.getTime();
-  const end = start + 60 * MINUTE;
+  const start = Math.floor(queryInstant.getTime() / (60 * MINUTE)) * 60 * MINUTE;
+  const end = queryInstant.getTime() + 60 * MINUTE;
   const rows = [];
   for (const city of cities) {
     // Sample offsets inside the actual window to handle DST changes.
@@ -96,7 +96,7 @@ function findMatches(targetWallTime, queryInstant, cities = CITIES) {
       // Verification rejects nonexistent times and preserves repeated local times.
       if (time >= start && time <= end &&
           wallTimeFromParts(getDateTimeParts(instant, city.tz)) === targetWallTime) {
-        rows.push({ city, instant, waitMinutes: (time - start) / MINUTE });
+        rows.push({ city, instant, waitMinutes: (time - queryInstant.getTime()) / MINUTE });
       }
     }
   }
@@ -191,7 +191,7 @@ function renderResults(rows, resultEl) {
     resultEl.append(group);
     textGroups.push(lines.join("\n\n"));
   }
-  if (!rows.length) resultEl.textContent = "未來一小時內，內建城市清單中沒有符合指定日期時間 A 的地點。";
+  if (!rows.length) resultEl.textContent = "目前小時至未來一小時內，內建城市清單中沒有符合指定日期時間 A 的地點。";
   return textGroups.join("\n\n");
 }
 
@@ -217,7 +217,8 @@ function pickerValue(date, hour) {
 }
 
 function selectNextTarget(targets, queryInstant) {
-  const b = wallTimeFromParts(getDateTimeParts(queryInstant, TAIPEI_TZ)) + queryInstant.getUTCMilliseconds();
+  const parts = getDateTimeParts(queryInstant, TAIPEI_TZ);
+  const b = wallTimeFromParts({ ...parts, minute: 0, second: 0 });
   return targets.map((value, index) => {
     try {
       const text = pickerValue(value.date, value.hour);

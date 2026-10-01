@@ -5,13 +5,13 @@ const city = name => CITIES.filter(c => c.name === name);
 const query = (a, b, name) => findMatches(parseWallTime(a), parseTaipeiInput(b), name ? city(name) : CITIES);
 test('user example: Shibuya and Tokyo in seven minutes, Taipei excluded', () => {
   const rows = query('20260923 11:00', '20260923 09:53');
-  assert.deepEqual(rows.map(r => r.city.name), ['東京', '涉谷']);
-  assert.ok(rows.every(r => r.waitMinutes === 7));
+  assert.deepEqual(rows.map(r => r.city.name), ['布里斯班', '雪梨', '阿得雷德', '東京', '涉谷']);
+  assert.ok(rows.filter(r => r.city.tz === 'Asia/Tokyo').every(r => r.waitMinutes === 7));
 });
 test('inclusive 0 and 60 minute boundaries, past and beyond excluded', () => {
   assert.equal(query('20260923 10:53', '20260923 09:53', '涉谷')[0].waitMinutes, 0);
   assert.equal(query('20260923 11:53', '20260923 09:53', '涉谷')[0].waitMinutes, 60);
-  assert.equal(query('20260923 10:52', '20260923 09:53', '涉谷').length, 0);
+  assert.equal(query('20260923 09:59', '20260923 09:53', '涉谷').length, 0);
   assert.equal(query('20260923 11:54', '20260923 09:53', '涉谷').length, 0);
 });
 test('cross midnight and full date comparison', () => {
@@ -34,8 +34,8 @@ test('DST nonexistent and repeated local times', () => {
   const rows = query('20261101 01:30', '20261101 13:30', '紐約');
   assert.deepEqual(rows.map(r => r.waitMinutes), [0, 60]);
 });
-test('seconds preserved: a target just passed is excluded', () => {
-  assert.equal(findMatches(parseWallTime('20260923 10:53'), new Date('2026-09-23T01:53:00.001Z'), city('涉谷')).length, 0);
+test('current hour includes a target that just passed', () => {
+  assert.equal(findMatches(parseWallTime('20260923 10:53'), new Date('2026-09-23T01:53:00.001Z'), city('涉谷')).length, 1);
 });
 test('grouped results, coordinate copy, full copy and validation', async () => {
   const fs = require('node:fs');
@@ -168,7 +168,7 @@ test('next A uses Taiwan B, skips past entries, sorts inputs and includes equali
   const targets = [ { date: '2026-09-23', hour: '18' }, { date: '2026-09-23', hour: '09' }, { date: '2026-09-23', hour: '14' } ];
   assert.equal(selectNextTarget(targets, parseTaipeiInput('20260923 10:00')).index, 2);
   assert.equal(selectNextTarget(targets, parseTaipeiInput('20260923 14:00')).index, 2);
-  assert.equal(selectNextTarget(targets, new Date('2026-09-23T06:00:00.001Z')).index, 0);
+  assert.equal(selectNextTarget(targets, new Date('2026-09-23T06:00:00.001Z')).index, 2);
   assert.equal(selectNextTarget(targets, parseTaipeiInput('20260924 00:00')), null);
   assert.throws(() => selectNextTarget([{ date: '', hour: '00' }], new Date()), /A1/);
 });

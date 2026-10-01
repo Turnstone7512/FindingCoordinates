@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finding Coordinates</title>
-  <link rel="stylesheet" href="style.css?v=20260924-hour-6">
+  <link rel="stylesheet" href="style.css?v=20261001-window-7">
 </head>
 <body>
   <main class="container">
     <header>
       <h1>Finding Coordinates</h1>
-      <p>指定當地時間 A，找出從時間 B 起一小時內會到達 A 的城市與座標</p>
+      <p>指定當地時間 A，找出B 所在整點至 B＋一小時內會到達 A 的城市與座標</p>
     </header>
 
     <section class="card">
@@ -18,7 +18,7 @@
       <div class="manual-area">
         <span>指定時間 A（各城市當地日期時間）</span>
         <div id="targetList"></div>
-        <small>最多 5 組，分鐘固定 00。只查詢不早於 B 的最近一組 A；全部早於 B 時顯示「A時間已過」。</small>
+        <small>最多 5 組，分鐘固定 00。只查詢不早於 B 所在整點的最近一組 A；全部早於該整點 時顯示「A時間已過」。</small>
       </div>
       <p id="targetStorageStatus" role="status" aria-live="polite"></p>
       <div class="mode">
@@ -56,6 +56,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260924-hour-6"></script>
+  <script src="app.js?v=20261001-window-7"></script>
 </body>
 </html>
