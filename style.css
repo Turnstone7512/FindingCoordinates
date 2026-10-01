@@ -184,3 +184,9 @@ button.remove-target { background: #b91c1c; }
   .target-row > button { grid-row: 2; }
   .target-row + .target-row { border-top: 1px solid #e2e8f0; padding-top: 10px; }
 }
+
+.page-version {
+  color: #cbd5e1;
+  font-size: 12px;
+  text-align: right;
+}
