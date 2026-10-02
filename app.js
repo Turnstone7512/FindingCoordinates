@@ -379,7 +379,8 @@ function renderResults(rows, resultEl) {
     const group = document.createElement("section");
     group.className = "time-group";
     const heading = document.createElement("h3");
-    heading.append("台灣時間：" + time.slice(0, 9));
+    const dateLabel = time.slice(0, 4) + "/" + time.slice(4, 6) + "/" + time.slice(6, 8);
+    heading.append("台灣時間：" + dateLabel + " ");
     const hour = document.createElement("span");
     hour.className = "taipei-hour";
     hour.textContent = time.slice(9, 11);
@@ -389,7 +390,7 @@ function renderResults(rows, resultEl) {
     minute.textContent = time.slice(12, 14);
     heading.append(minute);
     group.append(heading);
-    const lines = ["台灣時間：" + time];
+    const lines = ["台灣時間：" + dateLabel + time.slice(8)];
     const cityGroups = new Map();
     for (const city of cities) {
       const key = JSON.stringify([city.country, city.name]);
