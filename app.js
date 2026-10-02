@@ -224,88 +224,11 @@ const CITIES = [
     "country": "美屬薩摩亞"
   },
   {
-    "name": "威靈頓",
-    "lat": -41.2842,
-    "lon": 174.77568,
-    "tz": "Pacific/Auckland",
-    "country": "紐西蘭"
-  },
-  {
-    "name": "諾美亞",
-    "lat": -22.2854,
-    "lon": 166.4456,
-    "tz": "Pacific/Noumea",
-    "country": "新喀里多尼亞（法國）"
-  },
-  {
-    "name": "東京（涉谷）",
-    "lat": 35.65935760822602,
-    "lon": 139.70020316541195,
-    "tz": "Asia/Tokyo",
-    "country": "日本"
-  },
-  {
-    "name": "台北",
-    "lat": 25.033340287264995,
-    "lon": 121.53785549104212,
-    "tz": "Asia/Taipei",
-    "country": "台灣"
-  },
-  {
-    "name": "可倫坡",
-    "lat": 6.927565454456982,
-    "lon": 79.84471511095762,
-    "tz": "Asia/Colombo",
-    "country": "斯里蘭卡"
-  },
-  {
-    "name": "杜拜",
-    "lat": 25.2542,
-    "lon": 55.3048,
-    "tz": "Asia/Dubai",
-    "country": "阿聯酋"
-  },
-  {
-    "name": "科威特城",
-    "lat": 29.3745,
-    "lon": 47.9871,
-    "tz": "Asia/Kuwait",
-    "country": "科威特"
-  },
-  {
-    "name": "巴黎",
-    "lat": 48.8797,
-    "lon": 2.35613,
-    "tz": "Europe/Paris",
-    "country": "法國"
-  },
-  {
     "name": "倫敦",
     "lat": 51.5162,
     "lon": -0.1769,
     "tz": "Europe/London",
     "country": "英國"
-  },
-  {
-    "name": "英雄港",
-    "lat": 38.6566,
-    "lon": -27.2197,
-    "tz": "Atlantic/Azores",
-    "country": "葡萄牙"
-  },
-  {
-    "name": "聖約翰",
-    "lat": 47.56,
-    "lon": -52.756,
-    "tz": "America/St_Johns",
-    "country": "加拿大"
-  },
-  {
-    "name": "聖保羅",
-    "lat": -23.5553,
-    "lon": -46.6623,
-    "tz": "America/Sao_Paulo",
-    "country": "巴西"
   },
   {
     "name": "哈利法斯",
@@ -315,41 +238,6 @@ const CITIES = [
     "country": "加拿大"
   },
   {
-    "name": "紐約",
-    "lat": 40.726314,
-    "lon": -73.9966,
-    "tz": "America/New_York",
-    "country": "美國"
-  },
-  {
-    "name": "芝加哥",
-    "lat": 41.85345,
-    "lon": -87.634872,
-    "tz": "America/Chicago",
-    "country": "美國"
-  },
-  {
-    "name": "丹佛",
-    "lat": 39.74264,
-    "lon": -104.84,
-    "tz": "America/Denver",
-    "country": "美國"
-  },
-  {
-    "name": "舊金山",
-    "lat": 37.79498,
-    "lon": -122.39424,
-    "tz": "America/Los_Angeles",
-    "country": "美國"
-  },
-  {
-    "name": "檀香山",
-    "lat": 21.3071,
-    "lon": -157.8549,
-    "tz": "Pacific/Honolulu",
-    "country": "美國"
-  },
-  {
     "name": "安克拉治",
     "lat": 61.17393,
     "lon": -149.98189,
@@ -357,60 +245,11 @@ const CITIES = [
     "country": "美國"
   },
   {
-    "name": "威靈頓",
-    "lat": -41.283719,
-    "lon": 174.775904,
-    "tz": "Pacific/Auckland",
-    "country": "紐西蘭"
-  },
-  {
     "name": "胡志明市",
     "lat": 10.819982,
     "lon": 106.693566,
     "tz": "Asia/Ho_Chi_Minh",
     "country": "越南"
-  },
-  {
-    "name": "加德滿都",
-    "lat": 27.699954,
-    "lon": 85.357129,
-    "tz": "Asia/Kathmandu",
-    "country": "尼泊爾"
-  },
-  {
-    "name": "杜拜",
-    "lat": 25.254282387839783,
-    "lon": 55.30489582568407,
-    "tz": "Asia/Dubai",
-    "country": "阿聯酋"
-  },
-  {
-    "name": "巴黎",
-    "lat": 48.87977725234872,
-    "lon": 2.356135882437229,
-    "tz": "Europe/Paris",
-    "country": "法國"
-  },
-  {
-    "name": "倫敦",
-    "lat": 51.516208837876015,
-    "lon": -0.17696276307106018,
-    "tz": "Europe/London",
-    "country": "英國"
-  },
-  {
-    "name": "英雄港",
-    "lat": 38.65660377677335,
-    "lon": -27.219746746122837,
-    "tz": "Atlantic/Azores",
-    "country": "葡萄牙"
-  },
-  {
-    "name": "紐約",
-    "lat": 40.726028,
-    "lon": -73.996505,
-    "tz": "America/New_York",
-    "country": "美國"
   }
 ];
 
@@ -551,14 +390,24 @@ function renderResults(rows, resultEl) {
     heading.append(minute);
     group.append(heading);
     const lines = ["台灣時間：" + time];
+    const cityGroups = new Map();
     for (const city of cities) {
+      const key = JSON.stringify([city.country, city.name]);
+      if (!cityGroups.has(key)) cityGroups.set(key, []);
+      cityGroups.get(key).push(city);
+    }
+    for (const points of cityGroups.values()) {
+      const city = points[0];
       const entry = document.createElement("div");
       entry.className = "city-result";
       const name = document.createElement("div");
       name.textContent = city.country + "-" + city.name;
+      entry.append(name);
+      const cityLines = [name.textContent];
+      for (const point of points) {
       const coordinateRow = document.createElement("div");
       coordinateRow.className = "coordinate-row";
-      const coordinates = city.lat.toFixed(6) + ", " + city.lon.toFixed(6);
+      const coordinates = point.lat.toFixed(6) + ", " + point.lon.toFixed(6);
       const value = document.createElement("span");
       value.className = "coordinates";
       value.textContent = coordinates;
@@ -569,9 +418,11 @@ function renderResults(rows, resultEl) {
       button.setAttribute("aria-label", "複製" + city.name + "的座標");
       button.addEventListener("click", () => copyText(coordinates, button, "複製"));
       coordinateRow.append(value, button);
-      entry.append(name, coordinateRow);
+      entry.append(coordinateRow);
+      cityLines.push(coordinates);
+      }
       group.append(entry);
-      lines.push(name.textContent + "\n" + coordinates);
+      lines.push(cityLines.join("\n"));
     }
     resultEl.append(group);
     textGroups.push(lines.join("\n\n"));

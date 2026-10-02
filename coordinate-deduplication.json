@@ -1,0 +1,400 @@
+{
+  "date": "2026-10-03",
+  "thresholdKm": 1,
+  "originalCount": 59,
+  "retainedCount": 36,
+  "rule": "依原清單順序保留；與已保留座標距離小於等於1公里者合併到該點。",
+  "removed": [
+    {
+      "removed": {
+        "name": "威靈頓",
+        "lat": -41.2842,
+        "lon": 174.77568,
+        "tz": "Pacific/Auckland",
+        "country": "紐西蘭"
+      },
+      "retained": {
+        "name": "威靈頓",
+        "lat": -41.284212,
+        "lon": 174.775681,
+        "tz": "Pacific/Auckland",
+        "country": "紐西蘭"
+      },
+      "distanceKm": 0.0013369545967681937
+    },
+    {
+      "removed": {
+        "name": "諾美亞",
+        "lat": -22.2854,
+        "lon": 166.4456,
+        "tz": "Pacific/Noumea",
+        "country": "新喀里多尼亞（法國）"
+      },
+      "retained": {
+        "name": "諾美亞",
+        "lat": -22.28541,
+        "lon": 166.445664,
+        "tz": "Pacific/Noumea",
+        "country": "新喀里多尼亞（法國）"
+      },
+      "distanceKm": 0.0066781526450727345
+    },
+    {
+      "removed": {
+        "name": "東京（涉谷）",
+        "lat": 35.65935760822602,
+        "lon": 139.70020316541195,
+        "tz": "Asia/Tokyo",
+        "country": "日本"
+      },
+      "retained": {
+        "name": "東京（涉谷）",
+        "lat": 35.658863,
+        "lon": 139.700918,
+        "tz": "Asia/Tokyo",
+        "country": "日本"
+      },
+      "distanceKm": 0.08482729710189757
+    },
+    {
+      "removed": {
+        "name": "台北",
+        "lat": 25.033340287264995,
+        "lon": 121.53785549104212,
+        "tz": "Asia/Taipei",
+        "country": "台灣"
+      },
+      "retained": {
+        "name": "台北",
+        "lat": 25.033429,
+        "lon": 121.537823,
+        "tz": "Asia/Taipei",
+        "country": "台灣"
+      },
+      "distanceKm": 0.01039337799395553
+    },
+    {
+      "removed": {
+        "name": "可倫坡",
+        "lat": 6.927565454456982,
+        "lon": 79.84471511095762,
+        "tz": "Asia/Colombo",
+        "country": "斯里蘭卡"
+      },
+      "retained": {
+        "name": "可倫坡",
+        "lat": 6.927426,
+        "lon": 79.844689,
+        "tz": "Asia/Colombo",
+        "country": "斯里蘭卡"
+      },
+      "distanceKm": 0.015772233092023878
+    },
+    {
+      "removed": {
+        "name": "杜拜",
+        "lat": 25.2542,
+        "lon": 55.3048,
+        "tz": "Asia/Dubai",
+        "country": "阿聯酋"
+      },
+      "retained": {
+        "name": "杜拜",
+        "lat": 25.254678,
+        "lon": 55.304404,
+        "tz": "Asia/Dubai",
+        "country": "阿聯酋"
+      },
+      "distanceKm": 0.06641579340191853
+    },
+    {
+      "removed": {
+        "name": "科威特城",
+        "lat": 29.3745,
+        "lon": 47.9871,
+        "tz": "Asia/Kuwait",
+        "country": "科威特"
+      },
+      "retained": {
+        "name": "科威特城",
+        "lat": 29.374533,
+        "lon": 47.987123,
+        "tz": "Asia/Kuwait",
+        "country": "科威特"
+      },
+      "distanceKm": 0.004293223677965115
+    },
+    {
+      "removed": {
+        "name": "巴黎",
+        "lat": 48.8797,
+        "lon": 2.35613,
+        "tz": "Europe/Paris",
+        "country": "法國"
+      },
+      "retained": {
+        "name": "巴黎",
+        "lat": 48.879752,
+        "lon": 2.356136,
+        "tz": "Europe/Paris",
+        "country": "法國"
+      },
+      "distanceKm": 0.005798767187494061
+    },
+    {
+      "removed": {
+        "name": "英雄港",
+        "lat": 38.6566,
+        "lon": -27.2197,
+        "tz": "Atlantic/Azores",
+        "country": "葡萄牙"
+      },
+      "retained": {
+        "name": "英雄港",
+        "lat": 38.656718,
+        "lon": -27.219463,
+        "tz": "Atlantic/Azores",
+        "country": "葡萄牙"
+      },
+      "distanceKm": 0.02440634548252231
+    },
+    {
+      "removed": {
+        "name": "聖約翰",
+        "lat": 47.56,
+        "lon": -52.756,
+        "tz": "America/St_Johns",
+        "country": "加拿大"
+      },
+      "retained": {
+        "name": "聖約翰",
+        "lat": 47.560547,
+        "lon": -52.756198,
+        "tz": "America/St_Johns",
+        "country": "加拿大"
+      },
+      "distanceKm": 0.06261196334194138
+    },
+    {
+      "removed": {
+        "name": "聖保羅",
+        "lat": -23.5553,
+        "lon": -46.6623,
+        "tz": "America/Sao_Paulo",
+        "country": "巴西"
+      },
+      "retained": {
+        "name": "聖保羅",
+        "lat": -23.555305,
+        "lon": -46.66234,
+        "tz": "America/Sao_Paulo",
+        "country": "巴西"
+      },
+      "distanceKm": 0.004114921465900065
+    },
+    {
+      "removed": {
+        "name": "紐約",
+        "lat": 40.726314,
+        "lon": -73.9966,
+        "tz": "America/New_York",
+        "country": "美國"
+      },
+      "retained": {
+        "name": "紐約",
+        "lat": 40.726315,
+        "lon": -73.996669,
+        "tz": "America/New_York",
+        "country": "美國"
+      },
+      "distanceKm": 0.005815520463577819
+    },
+    {
+      "removed": {
+        "name": "芝加哥",
+        "lat": 41.85345,
+        "lon": -87.634872,
+        "tz": "America/Chicago",
+        "country": "美國"
+      },
+      "retained": {
+        "name": "芝加哥",
+        "lat": 41.853454,
+        "lon": -87.634872,
+        "tz": "America/Chicago",
+        "country": "美國"
+      },
+      "distanceKm": 0.0004447803206012578
+    },
+    {
+      "removed": {
+        "name": "丹佛",
+        "lat": 39.74264,
+        "lon": -104.84,
+        "tz": "America/Denver",
+        "country": "美國"
+      },
+      "retained": {
+        "name": "丹佛",
+        "lat": 39.74265,
+        "lon": -104.840074,
+        "tz": "America/Denver",
+        "country": "美國"
+      },
+      "distanceKm": 0.006424008412320921
+    },
+    {
+      "removed": {
+        "name": "舊金山",
+        "lat": 37.79498,
+        "lon": -122.39424,
+        "tz": "America/Los_Angeles",
+        "country": "美國"
+      },
+      "retained": {
+        "name": "舊金山",
+        "lat": 37.79498,
+        "lon": -122.394246,
+        "tz": "America/Los_Angeles",
+        "country": "美國"
+      },
+      "distanceKm": 0.000527203925054293
+    },
+    {
+      "removed": {
+        "name": "檀香山",
+        "lat": 21.3071,
+        "lon": -157.8549,
+        "tz": "Pacific/Honolulu",
+        "country": "美國"
+      },
+      "retained": {
+        "name": "檀香山",
+        "lat": 21.30719,
+        "lon": -157.854928,
+        "tz": "Pacific/Honolulu",
+        "country": "美國"
+      },
+      "distanceKm": 0.010419450057401353
+    },
+    {
+      "removed": {
+        "name": "威靈頓",
+        "lat": -41.283719,
+        "lon": 174.775904,
+        "tz": "Pacific/Auckland",
+        "country": "紐西蘭"
+      },
+      "retained": {
+        "name": "威靈頓",
+        "lat": -41.284212,
+        "lon": 174.775681,
+        "tz": "Pacific/Auckland",
+        "country": "紐西蘭"
+      },
+      "distanceKm": 0.0578994115959047
+    },
+    {
+      "removed": {
+        "name": "加德滿都",
+        "lat": 27.699954,
+        "lon": 85.357129,
+        "tz": "Asia/Kathmandu",
+        "country": "尼泊爾"
+      },
+      "retained": {
+        "name": "加德滿都",
+        "lat": 27.700214,
+        "lon": 85.356936,
+        "tz": "Asia/Kathmandu",
+        "country": "尼泊爾"
+      },
+      "distanceKm": 0.034595836535508635
+    },
+    {
+      "removed": {
+        "name": "杜拜",
+        "lat": 25.254282387839783,
+        "lon": 55.30489582568407,
+        "tz": "Asia/Dubai",
+        "country": "阿聯酋"
+      },
+      "retained": {
+        "name": "杜拜",
+        "lat": 25.254678,
+        "lon": 55.304404,
+        "tz": "Asia/Dubai",
+        "country": "阿聯酋"
+      },
+      "distanceKm": 0.06619348085300487
+    },
+    {
+      "removed": {
+        "name": "巴黎",
+        "lat": 48.87977725234872,
+        "lon": 2.356135882437229,
+        "tz": "Europe/Paris",
+        "country": "法國"
+      },
+      "retained": {
+        "name": "巴黎",
+        "lat": 48.879752,
+        "lon": 2.356136,
+        "tz": "Europe/Paris",
+        "country": "法國"
+      },
+      "distanceKm": 0.0028079501017206367
+    },
+    {
+      "removed": {
+        "name": "倫敦",
+        "lat": 51.516208837876015,
+        "lon": -0.17696276307106018,
+        "tz": "Europe/London",
+        "country": "英國"
+      },
+      "retained": {
+        "name": "倫敦",
+        "lat": 51.5162,
+        "lon": -0.1769,
+        "tz": "Europe/London",
+        "country": "英國"
+      },
+      "distanceKm": 0.004452748905609266
+    },
+    {
+      "removed": {
+        "name": "英雄港",
+        "lat": 38.65660377677335,
+        "lon": -27.219746746122837,
+        "tz": "Atlantic/Azores",
+        "country": "葡萄牙"
+      },
+      "retained": {
+        "name": "英雄港",
+        "lat": 38.656718,
+        "lon": -27.219463,
+        "tz": "Atlantic/Azores",
+        "country": "葡萄牙"
+      },
+      "distanceKm": 0.027719454690526793
+    },
+    {
+      "removed": {
+        "name": "紐約",
+        "lat": 40.726028,
+        "lon": -73.996505,
+        "tz": "America/New_York",
+        "country": "美國"
+      },
+      "retained": {
+        "name": "紐約",
+        "lat": 40.726315,
+        "lon": -73.996669,
+        "tz": "America/New_York",
+        "country": "美國"
+      },
+      "distanceKm": 0.03477683741423596
+    }
+  ]
+}

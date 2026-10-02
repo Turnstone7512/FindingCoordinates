@@ -86,6 +86,21 @@ test('grouped results, coordinate copy, full copy and validation', async () => {
   assert.match(copied[1], /台灣時間：20260923 15:00/);
   assert.ok(!copied[1].includes('複製'));
   assert.equal(elements.get('copyBtn').disabled, false);
+  elements.get('targetHour').value = '18';
+  elements.get('manualHour').value = '19';
+  elements.get('queryForm').submit({ preventDefault() {} });
+  const vietnamGroup = elements.get('result').children[0];
+  const vietnam = vietnamGroup.children.find(el => el.children?.[0]?.textContent === '越南-胡志明市');
+  assert.ok(vietnam);
+  const points = CITIES.filter(c => c.country === '越南' && c.name === '胡志明市');
+  assert.ok(points.length > 1);
+  assert.equal(vietnam.children.length, points.length + 1);
+  for (let i = 0; i < points.length; i++) {
+    await vietnam.children[i + 1].children[1].click();
+    assert.equal(copied.at(-1), points[i].lat.toFixed(6) + ', ' + points[i].lon.toFixed(6));
+  }
+  await elements.get('copyBtn').click();
+  assert.equal(copied.at(-1).split('越南-胡志明市').length - 1, 1);
   elements.get('manualDate').value = '';
   elements.get('queryForm').submit({ preventDefault() {} });
   assert.match(elements.get('result').textContent, /時間 B/);
@@ -173,7 +188,7 @@ test('A selection follows city instants instead of Taiwan wall-clock comparison'
   const b = parseTaipeiInput('20261002 21:00');
   assert.equal(selectNextTarget(targets, b).index, 0);
   const rows = query('20261002 19:00', '20261002 21:00');
-  const colombo = rows.find(r => r.city.lat === 6.927565454456982);
+  const colombo = rows.find(r => r.city.tz === "Asia/Colombo");
   assert.ok(colombo);
   assert.equal(colombo.instant.toISOString(), '2026-10-02T13:30:00.000Z');
   assert.equal(selectNextTarget(targets, parseTaipeiInput('20261005 00:00')), null);
@@ -186,14 +201,14 @@ test('overlapping A dates choose earliest actual event and retain current hour',
   assert.equal(selectNextTarget(targets, parseTaipeiInput('20261002 22:00'), city('可倫坡')).index, 1);
   assert.equal(selectNextTarget(targets, parseTaipeiInput('20261003 12:00')).index, 1);
 });
-test('all supplied coordinate points are available with country and valid time zone', () => {
+test('supplied points retain a representative within one kilometer with the same timezone', () => {
   const records = require('./coordinate-import.json');
   const key = c => c.lat.toFixed(6) + ',' + c.lon.toFixed(6);
   assert.equal(records.length, 45);
-  assert.equal(CITIES.length, 59);
+  assert.equal(CITIES.length, 36);
   assert.equal(new Set(CITIES.map(key)).size, CITIES.length);
   for (const record of records) {
-    const city = CITIES.find(c => key(c) === key(record));
+    const city = CITIES.find(c => distanceKm(c, record) <= 1);
     assert.ok(city, key(record));
     assert.equal(city.tz, record.tz);
   }
@@ -248,4 +263,23 @@ test('multiple A query keeps expired and earliest fallback behavior', () => {
   const early = queryAllTargets(targets, parseTaipeiInput('20261001 00:00'));
   assert.equal(early.groups.length, 1);
   assert.equal(early.groups[0].earliest, true);
+});
+
+function distanceKm(a, b) {
+  const rad = Math.PI / 180;
+  const h = Math.sin((b.lat-a.lat)*rad/2)**2 + Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin((b.lon-a.lon)*rad/2)**2;
+  return 12742.0176 * Math.atan2(Math.sqrt(h), Math.sqrt(1-h));
+}
+test('all retained points are more than one kilometer apart and removals are covered', () => {
+  const audit = require('./coordinate-deduplication.json');
+  assert.equal(audit.originalCount, CITIES.length + audit.removed.length);
+  for (let i=0;i<CITIES.length;i++) for(let j=i+1;j<CITIES.length;j++) {
+    assert.ok(distanceKm(CITIES[i], CITIES[j]) > 1, CITIES[i].name + '/' + CITIES[j].name);
+  }
+  for (const entry of audit.removed) {
+    const kept = CITIES.find(c => c.lat === entry.retained.lat && c.lon === entry.retained.lon);
+    assert.ok(kept);
+    assert.ok(distanceKm(kept, entry.removed) <= 1);
+    assert.equal(kept.tz, entry.removed.tz);
+  }
 });
