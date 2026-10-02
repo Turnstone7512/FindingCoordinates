@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finding Coordinates</title>
-  <link rel="stylesheet" href="style.css?v=20261001-0001">
+  <link rel="stylesheet" href="style.css?v=20261002-0003">
 </head>
 <body>
   <main class="container">
@@ -18,7 +18,7 @@
       <div class="manual-area">
         <span>指定時間 A（各城市當地日期時間）</span>
         <div id="targetList"></div>
-        <small>最多 5 組，分鐘固定 00。只查詢不早於 B 所在整點的最近一組 A；全部早於該整點 時顯示「A時間已過」。</small>
+        <small>最多 5 組，分鐘固定 00。同時顯示各組 A 在目前小時至未來一小時符合的城市；所有城市皆已過目前小時，才顯示「A時間已過」。</small>
       </div>
       <p id="targetStorageStatus" role="status" aria-live="polite"></p>
       <div class="mode">
@@ -54,9 +54,9 @@
       <div id="queryTime" class="query-time"></div>
       <div id="result" aria-live="polite">請輸入條件後按「查詢」。</div>
     </section>
-    <footer class="page-version" aria-label="程式版本">20261001-0001</footer>
+    <footer class="page-version" aria-label="程式版本">20261002-0003</footer>
   </main>
 
-  <script src="app.js?v=20261001-0001"></script>
+  <script src="app.js?v=20261002-0003"></script>
 </body>
 </html>

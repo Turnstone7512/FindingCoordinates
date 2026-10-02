@@ -190,3 +190,6 @@ button.remove-target { background: #b91c1c; }
   font-size: 12px;
   text-align: right;
 }
+
+.target-result-group + .target-result-group { margin-top: 28px; padding-top: 20px; border-top: 2px solid #cbd5e1; }
+.target-result-title { margin: 0 0 18px; font-size: 16px; color: #1d4ed8; }

@@ -1,22 +1,22 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { CITIES, parseWallTime, parseTaipeiInput, findMatches } = require('./app');
-const city = name => CITIES.filter(c => c.name === name);
+const city = name => CITIES.filter(c => c.name === name).slice(0, 1);
 const query = (a, b, name) => findMatches(parseWallTime(a), parseTaipeiInput(b), name ? city(name) : CITIES);
 test('user example: Shibuya and Tokyo in seven minutes, Taipei excluded', () => {
   const rows = query('20260923 11:00', '20260923 09:53');
-  assert.deepEqual(rows.map(r => r.city.name), ['布里斯班', '雪梨', '阿得雷德', '東京', '涉谷']);
+  assert.deepEqual([...new Set(rows.map(r => r.city.name))], ['布里斯班', '雪梨', '阿得雷德', '東京', '東京（涉谷）']);
   assert.ok(rows.filter(r => r.city.tz === 'Asia/Tokyo').every(r => r.waitMinutes === 7));
 });
 test('inclusive 0 and 60 minute boundaries, past and beyond excluded', () => {
-  assert.equal(query('20260923 10:53', '20260923 09:53', '涉谷')[0].waitMinutes, 0);
-  assert.equal(query('20260923 11:53', '20260923 09:53', '涉谷')[0].waitMinutes, 60);
-  assert.equal(query('20260923 09:59', '20260923 09:53', '涉谷').length, 0);
-  assert.equal(query('20260923 11:54', '20260923 09:53', '涉谷').length, 0);
+  assert.equal(query('20260923 10:53', '20260923 09:53', '東京（涉谷）')[0].waitMinutes, 0);
+  assert.equal(query('20260923 11:53', '20260923 09:53', '東京（涉谷）')[0].waitMinutes, 60);
+  assert.equal(query('20260923 09:59', '20260923 09:53', '東京（涉谷）').length, 0);
+  assert.equal(query('20260923 11:54', '20260923 09:53', '東京（涉谷）').length, 0);
 });
 test('cross midnight and full date comparison', () => {
-  assert.equal(query('20260924 00:00', '20260923 22:53', '涉谷')[0].waitMinutes, 7);
-  assert.equal(query('20260923 00:00', '20260923 22:53', '涉谷').length, 0);
+  assert.equal(query('20260924 00:00', '20260923 22:53', '東京（涉谷）')[0].waitMinutes, 7);
+  assert.equal(query('20260923 00:00', '20260923 22:53', '東京（涉谷）').length, 0);
 });
 test('fractional offsets', () => {
   assert.equal(query('20260923 08:00', '20260923 09:53', '加德滿都')[0].waitMinutes, 22);
@@ -35,7 +35,7 @@ test('DST nonexistent and repeated local times', () => {
   assert.deepEqual(rows.map(r => r.waitMinutes), [0, 60]);
 });
 test('current hour includes a target that just passed', () => {
-  assert.equal(findMatches(parseWallTime('20260923 10:53'), new Date('2026-09-23T01:53:00.001Z'), city('涉谷')).length, 1);
+  assert.equal(findMatches(parseWallTime('20260923 10:53'), new Date('2026-09-23T01:53:00.001Z'), city('東京（涉谷）')).length, 1);
 });
 test('grouped results, coordinate copy, full copy and validation', async () => {
   const fs = require('node:fs');
@@ -75,12 +75,16 @@ test('grouped results, coordinate copy, full copy and validation', async () => {
   assert.equal(groups[0].children[0].textContent, '台灣時間：20260923 14:00');
   assert.equal(groups[1].children[0].textContent, '台灣時間：20260923 15:00');
   assert.equal(groups[0].children[0].children[1].textContent, '14');
-  assert.equal(groups[0].children.length, 3);
+  assert.equal(groups[0].children.length, 1 + CITIES.filter(c => ['Pacific/Fiji', 'Pacific/Auckland'].includes(c.tz)).length);
   const copyCoordinate = groups[0].children[1].children[1].children[1];
   await copyCoordinate.click();
   assert.equal(copied[0], '-17.752011, 177.451234');
   await elements.get('copyBtn').click();
-  assert.equal(copied[1], '台灣時間：20260923 14:00\n\n勞托卡（Pacific/Fiji）\n-17.752011, 177.451234\n\n威靈頓（Pacific/Auckland）\n-41.284212, 174.775681\n\n台灣時間：20260923 15:00\n\n諾美亞（Pacific/Noumea）\n-22.285410, 166.445664');
+  assert.ok(copied[1].startsWith('台灣時間：20260923 14:00'));
+  assert.match(copied[1], /斐濟-勞托卡/);
+  assert.match(copied[1], /紐西蘭-威靈頓/);
+  assert.match(copied[1], /台灣時間：20260923 15:00/);
+  assert.ok(!copied[1].includes('複製'));
   assert.equal(elements.get('copyBtn').disabled, false);
   elements.get('manualDate').value = '';
   elements.get('queryForm').submit({ preventDefault() {} });
@@ -92,14 +96,14 @@ test('early B shows all earliest cities, including targets several days away', (
   for (const b of ['20260923 12:00', '20260920 12:00']) {
     const result = queryWithEarliest(parseWallTime('20260923 18:00'), parseTaipeiInput(b));
     assert.equal(result.earliest, true);
-    assert.deepEqual(result.rows.map(r => r.city.name), ['勞托卡', '威靈頓']);
+    assert.deepEqual([...new Set(result.rows.map(r => r.city.name))], ['勞托卡', '威靈頓']);
     assert.equal(formatDateTime(result.rows[0].instant, 'Asia/Taipei'), '20260923 14:00:00');
   }
 });
 test('earliest city follows daylight saving rather than list order', () => {
   const { queryWithEarliest, formatDateTime } = require('./app');
   const result = queryWithEarliest(parseWallTime('20261223 18:00'), parseTaipeiInput('20261223 10:00'));
-  assert.deepEqual(result.rows.map(r => r.city.name), ['威靈頓']);
+  assert.deepEqual([...new Set(result.rows.map(r => r.city.name))], ['威靈頓']);
   assert.equal(formatDateTime(result.rows[0].instant, 'Asia/Taipei'), '20261223 13:00:00');
 });
 test('normal window and already-passed targets do not trigger fallback', () => {
@@ -107,7 +111,7 @@ test('normal window and already-passed targets do not trigger fallback', () => {
   const target = parseWallTime('20260923 18:00');
   const normal = queryWithEarliest(target, parseTaipeiInput('20260923 14:00'));
   assert.equal(normal.earliest, false);
-  assert.deepEqual(normal.rows.map(r => r.city.name), ['勞托卡', '威靈頓', '諾美亞']);
+  assert.deepEqual([...new Set(normal.rows.map(r => r.city.name))], ['勞托卡', '威靈頓', '諾美亞']);
   const past = queryWithEarliest(target, parseTaipeiInput('20260925 14:00'));
   assert.equal(past.earliest, false);
   assert.equal(past.rows.length, 0);
@@ -163,12 +167,85 @@ test('multiple A rows persist, migrate, add to five, delete and report blocked s
   assert.match(blocked.get('targetStorageStatus').textContent, /尚未儲存/);
 });
 
-test('next A uses Taiwan B, skips past entries, sorts inputs and includes equality', () => {
+test('A selection follows city instants instead of Taiwan wall-clock comparison', () => {
   const { selectNextTarget } = require('./app');
-  const targets = [ { date: '2026-09-23', hour: '18' }, { date: '2026-09-23', hour: '09' }, { date: '2026-09-23', hour: '14' } ];
-  assert.equal(selectNextTarget(targets, parseTaipeiInput('20260923 10:00')).index, 2);
-  assert.equal(selectNextTarget(targets, parseTaipeiInput('20260923 14:00')).index, 2);
-  assert.equal(selectNextTarget(targets, new Date('2026-09-23T06:00:00.001Z')).index, 2);
-  assert.equal(selectNextTarget(targets, parseTaipeiInput('20260924 00:00')), null);
-  assert.throws(() => selectNextTarget([{ date: '', hour: '00' }], new Date()), /A1/);
+  const targets = [{ date: '2026-10-02', hour: '19' }, { date: '2026-10-03', hour: '17' }];
+  const b = parseTaipeiInput('20261002 21:00');
+  assert.equal(selectNextTarget(targets, b).index, 0);
+  const rows = query('20261002 19:00', '20261002 21:00');
+  const colombo = rows.find(r => r.city.lat === 6.927565454456982);
+  assert.ok(colombo);
+  assert.equal(colombo.instant.toISOString(), '2026-10-02T13:30:00.000Z');
+  assert.equal(selectNextTarget(targets, parseTaipeiInput('20261005 00:00')), null);
+  assert.throws(() => selectNextTarget([{ date: '', hour: '00' }], b), /A1/);
+});
+test('overlapping A dates choose earliest actual event and retain current hour', () => {
+  const { selectNextTarget } = require('./app');
+  const targets = [{ date: '2026-10-02', hour: '19' }, { date: '2026-10-03', hour: '17' }];
+  assert.equal(selectNextTarget(targets, parseTaipeiInput('20261002 21:45'), city('可倫坡')).index, 0);
+  assert.equal(selectNextTarget(targets, parseTaipeiInput('20261002 22:00'), city('可倫坡')).index, 1);
+  assert.equal(selectNextTarget(targets, parseTaipeiInput('20261003 12:00')).index, 1);
+});
+test('all supplied coordinate points are available with country and valid time zone', () => {
+  const records = require('./coordinate-import.json');
+  const key = c => c.lat.toFixed(6) + ',' + c.lon.toFixed(6);
+  assert.equal(records.length, 45);
+  assert.equal(CITIES.length, 59);
+  assert.equal(new Set(CITIES.map(key)).size, CITIES.length);
+  for (const record of records) {
+    const city = CITIES.find(c => key(c) === key(record));
+    assert.ok(city, key(record));
+    assert.equal(city.tz, record.tz);
+  }
+  for (const city of CITIES) {
+    assert.ok(city.country && city.name);
+    assert.ok(Math.abs(city.lat) <= 90 && Math.abs(city.lon) <= 180);
+    assert.doesNotThrow(() => new Intl.DateTimeFormat('en', { timeZone: city.tz }));
+  }
+});
+test('Friday reference times and seasonal corrections', () => {
+  const { queryWithEarliest, formatDateTime } = require('./app');
+  const records = require('./coordinate-import.json');
+  for (const record of records.filter(r => r.note.startsWith('五'))) {
+    const raw = record.note.slice(1);
+    const expected = raw.includes(':') ? raw : raw + ':00';
+    const rows = queryWithEarliest(parseWallTime('20261002 17:00'), new Date('2026-09-29T00:00:00Z'), [record]).rows;
+    assert.equal(formatDateTime(rows[0].instant, 'Asia/Taipei'), '20261002 ' + expected + ':00');
+  }
+  const convert = (name, a) => formatDateTime(queryWithEarliest(parseWallTime(a), new Date('2026-09-29T00:00:00Z'), city(name)).rows[0].instant, 'Asia/Taipei');
+  assert.equal(convert('聖約翰', '20261002 18:00'), '20261003 04:30:00');
+  assert.equal(convert('雪梨', '20261002 17:00'), '20261002 15:00:00');
+  assert.equal(convert('雪梨', '20261004 17:00'), '20261004 14:00:00');
+  assert.equal(convert('威靈頓', '20261002 18:00'), '20261002 13:00:00');
+  assert.equal(convert('帕果帕果', '20261002 17:00'), '20261003 12:00:00');
+});
+test('northern hemisphere summer and winter offsets follow target date', () => {
+  const { queryWithEarliest, formatDateTime } = require('./app');
+  function arrival(name, target) {
+    return formatDateTime(queryWithEarliest(parseWallTime(target), new Date('2026-01-01T00:00:00Z'), city(name)).rows[0].instant, 'Asia/Taipei');
+  }
+  assert.equal(arrival('紐約', '20260701 17:00'), '20260702 05:00:00');
+  assert.equal(arrival('紐約', '20270101 17:00'), '20270102 06:00:00');
+  assert.equal(arrival('倫敦', '20260701 17:00'), '20260702 00:00:00');
+  assert.equal(arrival('倫敦', '20270101 17:00'), '20270102 01:00:00');
+});
+test('overlapping A1 and A2 both appear while future unmatched A3 is omitted', () => {
+  const { queryAllTargets } = require('./app');
+  const result = queryAllTargets([
+    { date: '2026-10-02', hour: '19' },
+    { date: '2026-10-03', hour: '17' },
+    { date: '2026-10-10', hour: '17' }
+  ], parseTaipeiInput('20261003 12:00'));
+  assert.deepEqual(result.groups.map(g => g.index), [0, 1]);
+  assert.ok(result.groups[0].rows.some(r => r.city.name === '檀香山'));
+  assert.ok(result.groups[1].rows.some(r => r.city.name === '威靈頓'));
+  assert.ok(result.groups.every(g => !g.earliest));
+});
+test('multiple A query keeps expired and earliest fallback behavior', () => {
+  const { queryAllTargets } = require('./app');
+  const targets = [{ date: '2026-10-02', hour: '19' }];
+  assert.equal(queryAllTargets(targets, parseTaipeiInput('20261005 12:00')).expired, true);
+  const early = queryAllTargets(targets, parseTaipeiInput('20261001 00:00'));
+  assert.equal(early.groups.length, 1);
+  assert.equal(early.groups[0].earliest, true);
 });

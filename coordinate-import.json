@@ -1,0 +1,407 @@
+[
+  {
+    "name": "威靈頓",
+    "lat": -41.2842,
+    "lon": 174.77568,
+    "tz": "Pacific/Auckland",
+    "country": "紐西蘭",
+    "note": "五12",
+    "added": true
+  },
+  {
+    "name": "勞托卡",
+    "lat": -17.752011,
+    "lon": 177.451234,
+    "tz": "Pacific/Fiji",
+    "country": "斐濟",
+    "note": "五13",
+    "added": false
+  },
+  {
+    "name": "諾美亞",
+    "lat": -22.2854,
+    "lon": 166.4456,
+    "tz": "Pacific/Noumea",
+    "country": "新喀里多尼亞（法國）",
+    "note": "五14",
+    "added": true
+  },
+  {
+    "name": "雪梨",
+    "lat": -33.873965933365845,
+    "lon": 151.2067272886634,
+    "tz": "Australia/Sydney",
+    "country": "澳洲",
+    "note": "五15",
+    "added": false
+  },
+  {
+    "name": "東京（涉谷）",
+    "lat": 35.65935760822602,
+    "lon": 139.70020316541195,
+    "tz": "Asia/Tokyo",
+    "country": "日本",
+    "note": "五16",
+    "added": true
+  },
+  {
+    "name": "台北",
+    "lat": 25.033340287264995,
+    "lon": 121.53785549104212,
+    "tz": "Asia/Taipei",
+    "country": "台灣",
+    "note": "五17",
+    "added": true
+  },
+  {
+    "name": "胡志明市",
+    "lat": 10.792277224961293,
+    "lon": 106.68076079338789,
+    "tz": "Asia/Ho_Chi_Minh",
+    "country": "越南",
+    "note": "五18",
+    "added": false
+  },
+  {
+    "name": "加德滿都",
+    "lat": 27.70021385620113,
+    "lon": 85.35693559795618,
+    "tz": "Asia/Kathmandu",
+    "country": "尼泊爾",
+    "note": "五19:15",
+    "added": false
+  },
+  {
+    "name": "可倫坡",
+    "lat": 6.927565454456982,
+    "lon": 79.84471511095762,
+    "tz": "Asia/Colombo",
+    "country": "斯里蘭卡",
+    "note": "五19:30",
+    "added": true
+  },
+  {
+    "name": "杜拜",
+    "lat": 25.2542,
+    "lon": 55.3048,
+    "tz": "Asia/Dubai",
+    "country": "阿聯酋",
+    "note": "五21",
+    "added": true
+  },
+  {
+    "name": "科威特城",
+    "lat": 29.3745,
+    "lon": 47.9871,
+    "tz": "Asia/Kuwait",
+    "country": "科威特",
+    "note": "五22",
+    "added": true
+  },
+  {
+    "name": "巴黎",
+    "lat": 48.8797,
+    "lon": 2.35613,
+    "tz": "Europe/Paris",
+    "country": "法國",
+    "note": "五23",
+    "added": true
+  },
+  {
+    "name": "倫敦",
+    "lat": 51.5162,
+    "lon": -0.1769,
+    "tz": "Europe/London",
+    "country": "英國",
+    "note": "六00（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "英雄港",
+    "lat": 38.6566,
+    "lon": -27.2197,
+    "tz": "Atlantic/Azores",
+    "country": "葡萄牙",
+    "note": "六01（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "聖約翰",
+    "lat": 47.56,
+    "lon": -52.756,
+    "tz": "America/St_Johns",
+    "country": "加拿大",
+    "note": "六03:30（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "聖保羅",
+    "lat": -23.5553,
+    "lon": -46.6623,
+    "tz": "America/Sao_Paulo",
+    "country": "巴西",
+    "note": "六04（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "哈利法斯",
+    "lat": 44.645972,
+    "lon": -63.572924,
+    "tz": "America/Halifax",
+    "country": "加拿大",
+    "note": "未標時間",
+    "added": true
+  },
+  {
+    "name": "紐約",
+    "lat": 40.726314,
+    "lon": -73.9966,
+    "tz": "America/New_York",
+    "country": "美國",
+    "note": "六05（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "芝加哥",
+    "lat": 41.85345,
+    "lon": -87.634872,
+    "tz": "America/Chicago",
+    "country": "美國",
+    "note": "六06（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "丹佛",
+    "lat": 39.74264,
+    "lon": -104.84,
+    "tz": "America/Denver",
+    "country": "美國",
+    "note": "六07（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "舊金山",
+    "lat": 37.79498,
+    "lon": -122.39424,
+    "tz": "America/Los_Angeles",
+    "country": "美國",
+    "note": "六08（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "檀香山",
+    "lat": 21.3071,
+    "lon": -157.8549,
+    "tz": "Pacific/Honolulu",
+    "country": "美國",
+    "note": "六11（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "安克拉治",
+    "lat": 61.17393,
+    "lon": -149.98189,
+    "tz": "America/Anchorage",
+    "country": "美國",
+    "note": "六09（僅新增座標）",
+    "added": true
+  },
+  {
+    "name": "威靈頓",
+    "lat": -41.283719,
+    "lon": 174.775904,
+    "tz": "Pacific/Auckland",
+    "country": "紐西蘭",
+    "note": "台灣13:00，當地18:00",
+    "added": true
+  },
+  {
+    "name": "勞托卡",
+    "lat": -17.752011,
+    "lon": 177.451234,
+    "tz": "Pacific/Fiji",
+    "country": "斐濟",
+    "note": "台灣14:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "諾美亞",
+    "lat": -22.285409967196934,
+    "lon": 166.44566394388676,
+    "tz": "Pacific/Noumea",
+    "country": "新喀里多尼亞（法國）",
+    "note": "台灣15:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "布里斯班",
+    "lat": -27.469553,
+    "lon": 153.026319,
+    "tz": "Australia/Brisbane",
+    "country": "澳洲",
+    "note": "台灣16:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "胡志明市",
+    "lat": 10.819982,
+    "lon": 106.693566,
+    "tz": "Asia/Ho_Chi_Minh",
+    "country": "越南",
+    "note": "台灣19:00，當地18:00",
+    "added": true
+  },
+  {
+    "name": "加德滿都",
+    "lat": 27.699954,
+    "lon": 85.357129,
+    "tz": "Asia/Kathmandu",
+    "country": "尼泊爾",
+    "note": "台灣20:15，當地18:00",
+    "added": true
+  },
+  {
+    "name": "馬累",
+    "lat": 4.176791,
+    "lon": 73.518123,
+    "tz": "Indian/Maldives",
+    "country": "馬爾地夫",
+    "note": "台灣21:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "杜拜",
+    "lat": 25.254282387839783,
+    "lon": 55.30489582568407,
+    "tz": "Asia/Dubai",
+    "country": "阿聯酋",
+    "note": "台灣22:00，當地18:00",
+    "added": true
+  },
+  {
+    "name": "科威特城",
+    "lat": 29.374533,
+    "lon": 47.987123,
+    "tz": "Asia/Kuwait",
+    "country": "科威特",
+    "note": "台灣23:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "巴黎",
+    "lat": 48.87977725234872,
+    "lon": 2.356135882437229,
+    "tz": "Europe/Paris",
+    "country": "法國",
+    "note": "台灣00:00，當地18:00",
+    "added": true
+  },
+  {
+    "name": "倫敦",
+    "lat": 51.516208837876015,
+    "lon": -0.17696276307106018,
+    "tz": "Europe/London",
+    "country": "英國",
+    "note": "台灣01:00，當地18:00",
+    "added": true
+  },
+  {
+    "name": "英雄港",
+    "lat": 38.65660377677335,
+    "lon": -27.219746746122837,
+    "tz": "Atlantic/Azores",
+    "country": "葡萄牙",
+    "note": "台灣02:00，當地18:00",
+    "added": true
+  },
+  {
+    "name": "聖約翰",
+    "lat": 47.560547,
+    "lon": -52.756198,
+    "tz": "America/St_Johns",
+    "country": "加拿大",
+    "note": "台灣04:15，當地18:00",
+    "added": false
+  },
+  {
+    "name": "聖保羅",
+    "lat": -23.555305,
+    "lon": -46.66234,
+    "tz": "America/Sao_Paulo",
+    "country": "巴西",
+    "note": "台灣05:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "聖路易斯",
+    "lat": -2.518875,
+    "lon": -44.225159,
+    "tz": "America/Fortaleza",
+    "country": "巴西",
+    "note": "台灣05:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "哈利法斯",
+    "lat": 44.67064,
+    "lon": -63.574253,
+    "tz": "America/Halifax",
+    "country": "加拿大",
+    "note": "台灣05:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "紐約",
+    "lat": 40.726028,
+    "lon": -73.996505,
+    "tz": "America/New_York",
+    "country": "美國",
+    "note": "台灣06:00，當地18:00",
+    "added": true
+  },
+  {
+    "name": "芝加哥",
+    "lat": 41.85345391167718,
+    "lon": -87.63487234711647,
+    "tz": "America/Chicago",
+    "country": "美國",
+    "note": "台灣07:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "威靈頓",
+    "lat": -41.284212,
+    "lon": 174.775681,
+    "tz": "Pacific/Auckland",
+    "country": "紐西蘭",
+    "note": "台灣08:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "諾美亞",
+    "lat": -22.285409967196934,
+    "lon": 166.44566394388676,
+    "tz": "Pacific/Noumea",
+    "country": "新喀里多尼亞（法國）",
+    "note": "台灣10:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "布里斯班",
+    "lat": -27.469553,
+    "lon": 153.026319,
+    "tz": "Australia/Brisbane",
+    "country": "澳洲",
+    "note": "台灣11:00，當地18:00",
+    "added": false
+  },
+  {
+    "name": "檀香山",
+    "lat": 21.307189868073014,
+    "lon": -157.8549276664853,
+    "tz": "Pacific/Honolulu",
+    "country": "美國",
+    "note": "台灣12:00，當地18:00",
+    "added": false
+  }
+]

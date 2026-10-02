@@ -1,36 +1,417 @@
 const CITIES = [
-  { name: "勞托卡", lat: -17.752011, lon: 177.451234, tz: "Pacific/Fiji" },
-  { name: "威靈頓", lat: -41.284212, lon: 174.775681, tz: "Pacific/Auckland" },
-  { name: "諾美亞", lat: -22.285410, lon: 166.445664, tz: "Pacific/Noumea" },
-  { name: "布里斯班", lat: -27.469553, lon: 153.026319, tz: "Australia/Brisbane" },
-  { name: "雪梨", lat: -33.873966, lon: 151.206727, tz: "Australia/Sydney" },
-  { name: "阿得雷德", lat: -34.924074, lon: 138.600717, tz: "Australia/Adelaide" },
-  { name: "東京", lat: 35.680606, lon: 139.763719, tz: "Asia/Tokyo" },
-  { name: "涉谷", lat: 35.658863, lon: 139.700918, tz: "Asia/Tokyo" },
-  { name: "台北", lat: 25.033429, lon: 121.537823, tz: "Asia/Taipei" },
-  { name: "曼谷", lat: 13.748380, lon: 100.503438, tz: "Asia/Bangkok" },
-  { name: "胡志明市", lat: 10.792277, lon: 106.680761, tz: "Asia/Ho_Chi_Minh" },
-  { name: "加德滿都", lat: 27.700214, lon: 85.356936, tz: "Asia/Kathmandu" },
-  { name: "可倫坡", lat: 6.927426, lon: 79.844689, tz: "Asia/Colombo" },
-  { name: "馬爾地夫", lat: 4.176791, lon: 73.518123, tz: "Indian/Maldives" },
-  { name: "杜拜", lat: 25.254678, lon: 55.304404, tz: "Asia/Dubai" },
-  { name: "科威特城", lat: 29.374533, lon: 47.987123, tz: "Asia/Kuwait" },
-  { name: "雅典", lat: 37.969056, lon: 23.752648, tz: "Europe/Athens" },
-  { name: "巴黎", lat: 48.879752, lon: 2.356136, tz: "Europe/Paris" },
-  { name: "倫敦", lat: 51.510223, lon: -0.133832, tz: "Europe/London" },
-  { name: "英雄港", lat: 38.656718, lon: -27.219463, tz: "Atlantic/Azores" },
-  { name: "雷克雅維克", lat: 64.145725, lon: -21.926867, tz: "Atlantic/Reykjavik" },
-  { name: "聖約翰", lat: 47.560547, lon: -52.756198, tz: "America/St_Johns" },
-  { name: "哈利法斯", lat: 44.670640, lon: -63.574253, tz: "America/Halifax" },
-  { name: "聖保羅", lat: -23.555305, lon: -46.662340, tz: "America/Sao_Paulo" },
-  { name: "聖路易斯", lat: -2.518875, lon: -44.225159, tz: "America/Fortaleza" },
-  { name: "紐約", lat: 40.726315, lon: -73.996669, tz: "America/New_York" },
-  { name: "芝加哥", lat: 41.853454, lon: -87.634872, tz: "America/Chicago" },
-  { name: "丹佛", lat: 39.742650, lon: -104.840074, tz: "America/Denver" },
-  { name: "舊金山", lat: 37.794980, lon: -122.394246, tz: "America/Los_Angeles" },
-  { name: "安克拉治", lat: 61.217990, lon: -149.900375, tz: "America/Anchorage" },
-  { name: "檀香山", lat: 21.307190, lon: -157.854928, tz: "Pacific/Honolulu" },
-  { name: "美屬薩摩亞", lat: -14.277986, lon: -170.687944, tz: "Pacific/Pago_Pago" }
+  {
+    "name": "勞托卡",
+    "lat": -17.752011,
+    "lon": 177.451234,
+    "tz": "Pacific/Fiji",
+    "country": "斐濟"
+  },
+  {
+    "name": "威靈頓",
+    "lat": -41.284212,
+    "lon": 174.775681,
+    "tz": "Pacific/Auckland",
+    "country": "紐西蘭"
+  },
+  {
+    "name": "諾美亞",
+    "lat": -22.28541,
+    "lon": 166.445664,
+    "tz": "Pacific/Noumea",
+    "country": "新喀里多尼亞（法國）"
+  },
+  {
+    "name": "布里斯班",
+    "lat": -27.469553,
+    "lon": 153.026319,
+    "tz": "Australia/Brisbane",
+    "country": "澳洲"
+  },
+  {
+    "name": "雪梨",
+    "lat": -33.873966,
+    "lon": 151.206727,
+    "tz": "Australia/Sydney",
+    "country": "澳洲"
+  },
+  {
+    "name": "阿得雷德",
+    "lat": -34.924074,
+    "lon": 138.600717,
+    "tz": "Australia/Adelaide",
+    "country": "澳洲"
+  },
+  {
+    "name": "東京",
+    "lat": 35.680606,
+    "lon": 139.763719,
+    "tz": "Asia/Tokyo",
+    "country": "日本"
+  },
+  {
+    "name": "東京（涉谷）",
+    "lat": 35.658863,
+    "lon": 139.700918,
+    "tz": "Asia/Tokyo",
+    "country": "日本"
+  },
+  {
+    "name": "台北",
+    "lat": 25.033429,
+    "lon": 121.537823,
+    "tz": "Asia/Taipei",
+    "country": "台灣"
+  },
+  {
+    "name": "曼谷",
+    "lat": 13.74838,
+    "lon": 100.503438,
+    "tz": "Asia/Bangkok",
+    "country": "泰國"
+  },
+  {
+    "name": "胡志明市",
+    "lat": 10.792277,
+    "lon": 106.680761,
+    "tz": "Asia/Ho_Chi_Minh",
+    "country": "越南"
+  },
+  {
+    "name": "加德滿都",
+    "lat": 27.700214,
+    "lon": 85.356936,
+    "tz": "Asia/Kathmandu",
+    "country": "尼泊爾"
+  },
+  {
+    "name": "可倫坡",
+    "lat": 6.927426,
+    "lon": 79.844689,
+    "tz": "Asia/Colombo",
+    "country": "斯里蘭卡"
+  },
+  {
+    "name": "馬累",
+    "lat": 4.176791,
+    "lon": 73.518123,
+    "tz": "Indian/Maldives",
+    "country": "馬爾地夫"
+  },
+  {
+    "name": "杜拜",
+    "lat": 25.254678,
+    "lon": 55.304404,
+    "tz": "Asia/Dubai",
+    "country": "阿聯酋"
+  },
+  {
+    "name": "科威特城",
+    "lat": 29.374533,
+    "lon": 47.987123,
+    "tz": "Asia/Kuwait",
+    "country": "科威特"
+  },
+  {
+    "name": "雅典",
+    "lat": 37.969056,
+    "lon": 23.752648,
+    "tz": "Europe/Athens",
+    "country": "希臘"
+  },
+  {
+    "name": "巴黎",
+    "lat": 48.879752,
+    "lon": 2.356136,
+    "tz": "Europe/Paris",
+    "country": "法國"
+  },
+  {
+    "name": "倫敦",
+    "lat": 51.510223,
+    "lon": -0.133832,
+    "tz": "Europe/London",
+    "country": "英國"
+  },
+  {
+    "name": "英雄港",
+    "lat": 38.656718,
+    "lon": -27.219463,
+    "tz": "Atlantic/Azores",
+    "country": "葡萄牙"
+  },
+  {
+    "name": "雷克雅維克",
+    "lat": 64.145725,
+    "lon": -21.926867,
+    "tz": "Atlantic/Reykjavik",
+    "country": "冰島"
+  },
+  {
+    "name": "聖約翰",
+    "lat": 47.560547,
+    "lon": -52.756198,
+    "tz": "America/St_Johns",
+    "country": "加拿大"
+  },
+  {
+    "name": "哈利法斯",
+    "lat": 44.67064,
+    "lon": -63.574253,
+    "tz": "America/Halifax",
+    "country": "加拿大"
+  },
+  {
+    "name": "聖保羅",
+    "lat": -23.555305,
+    "lon": -46.66234,
+    "tz": "America/Sao_Paulo",
+    "country": "巴西"
+  },
+  {
+    "name": "聖路易斯",
+    "lat": -2.518875,
+    "lon": -44.225159,
+    "tz": "America/Fortaleza",
+    "country": "巴西"
+  },
+  {
+    "name": "紐約",
+    "lat": 40.726315,
+    "lon": -73.996669,
+    "tz": "America/New_York",
+    "country": "美國"
+  },
+  {
+    "name": "芝加哥",
+    "lat": 41.853454,
+    "lon": -87.634872,
+    "tz": "America/Chicago",
+    "country": "美國"
+  },
+  {
+    "name": "丹佛",
+    "lat": 39.74265,
+    "lon": -104.840074,
+    "tz": "America/Denver",
+    "country": "美國"
+  },
+  {
+    "name": "舊金山",
+    "lat": 37.79498,
+    "lon": -122.394246,
+    "tz": "America/Los_Angeles",
+    "country": "美國"
+  },
+  {
+    "name": "安克拉治",
+    "lat": 61.21799,
+    "lon": -149.900375,
+    "tz": "America/Anchorage",
+    "country": "美國"
+  },
+  {
+    "name": "檀香山",
+    "lat": 21.30719,
+    "lon": -157.854928,
+    "tz": "Pacific/Honolulu",
+    "country": "美國"
+  },
+  {
+    "name": "帕果帕果",
+    "lat": -14.277986,
+    "lon": -170.687944,
+    "tz": "Pacific/Pago_Pago",
+    "country": "美屬薩摩亞"
+  },
+  {
+    "name": "威靈頓",
+    "lat": -41.2842,
+    "lon": 174.77568,
+    "tz": "Pacific/Auckland",
+    "country": "紐西蘭"
+  },
+  {
+    "name": "諾美亞",
+    "lat": -22.2854,
+    "lon": 166.4456,
+    "tz": "Pacific/Noumea",
+    "country": "新喀里多尼亞（法國）"
+  },
+  {
+    "name": "東京（涉谷）",
+    "lat": 35.65935760822602,
+    "lon": 139.70020316541195,
+    "tz": "Asia/Tokyo",
+    "country": "日本"
+  },
+  {
+    "name": "台北",
+    "lat": 25.033340287264995,
+    "lon": 121.53785549104212,
+    "tz": "Asia/Taipei",
+    "country": "台灣"
+  },
+  {
+    "name": "可倫坡",
+    "lat": 6.927565454456982,
+    "lon": 79.84471511095762,
+    "tz": "Asia/Colombo",
+    "country": "斯里蘭卡"
+  },
+  {
+    "name": "杜拜",
+    "lat": 25.2542,
+    "lon": 55.3048,
+    "tz": "Asia/Dubai",
+    "country": "阿聯酋"
+  },
+  {
+    "name": "科威特城",
+    "lat": 29.3745,
+    "lon": 47.9871,
+    "tz": "Asia/Kuwait",
+    "country": "科威特"
+  },
+  {
+    "name": "巴黎",
+    "lat": 48.8797,
+    "lon": 2.35613,
+    "tz": "Europe/Paris",
+    "country": "法國"
+  },
+  {
+    "name": "倫敦",
+    "lat": 51.5162,
+    "lon": -0.1769,
+    "tz": "Europe/London",
+    "country": "英國"
+  },
+  {
+    "name": "英雄港",
+    "lat": 38.6566,
+    "lon": -27.2197,
+    "tz": "Atlantic/Azores",
+    "country": "葡萄牙"
+  },
+  {
+    "name": "聖約翰",
+    "lat": 47.56,
+    "lon": -52.756,
+    "tz": "America/St_Johns",
+    "country": "加拿大"
+  },
+  {
+    "name": "聖保羅",
+    "lat": -23.5553,
+    "lon": -46.6623,
+    "tz": "America/Sao_Paulo",
+    "country": "巴西"
+  },
+  {
+    "name": "哈利法斯",
+    "lat": 44.645972,
+    "lon": -63.572924,
+    "tz": "America/Halifax",
+    "country": "加拿大"
+  },
+  {
+    "name": "紐約",
+    "lat": 40.726314,
+    "lon": -73.9966,
+    "tz": "America/New_York",
+    "country": "美國"
+  },
+  {
+    "name": "芝加哥",
+    "lat": 41.85345,
+    "lon": -87.634872,
+    "tz": "America/Chicago",
+    "country": "美國"
+  },
+  {
+    "name": "丹佛",
+    "lat": 39.74264,
+    "lon": -104.84,
+    "tz": "America/Denver",
+    "country": "美國"
+  },
+  {
+    "name": "舊金山",
+    "lat": 37.79498,
+    "lon": -122.39424,
+    "tz": "America/Los_Angeles",
+    "country": "美國"
+  },
+  {
+    "name": "檀香山",
+    "lat": 21.3071,
+    "lon": -157.8549,
+    "tz": "Pacific/Honolulu",
+    "country": "美國"
+  },
+  {
+    "name": "安克拉治",
+    "lat": 61.17393,
+    "lon": -149.98189,
+    "tz": "America/Anchorage",
+    "country": "美國"
+  },
+  {
+    "name": "威靈頓",
+    "lat": -41.283719,
+    "lon": 174.775904,
+    "tz": "Pacific/Auckland",
+    "country": "紐西蘭"
+  },
+  {
+    "name": "胡志明市",
+    "lat": 10.819982,
+    "lon": 106.693566,
+    "tz": "Asia/Ho_Chi_Minh",
+    "country": "越南"
+  },
+  {
+    "name": "加德滿都",
+    "lat": 27.699954,
+    "lon": 85.357129,
+    "tz": "Asia/Kathmandu",
+    "country": "尼泊爾"
+  },
+  {
+    "name": "杜拜",
+    "lat": 25.254282387839783,
+    "lon": 55.30489582568407,
+    "tz": "Asia/Dubai",
+    "country": "阿聯酋"
+  },
+  {
+    "name": "巴黎",
+    "lat": 48.87977725234872,
+    "lon": 2.356135882437229,
+    "tz": "Europe/Paris",
+    "country": "法國"
+  },
+  {
+    "name": "倫敦",
+    "lat": 51.516208837876015,
+    "lon": -0.17696276307106018,
+    "tz": "Europe/London",
+    "country": "英國"
+  },
+  {
+    "name": "英雄港",
+    "lat": 38.65660377677335,
+    "lon": -27.219746746122837,
+    "tz": "Atlantic/Azores",
+    "country": "葡萄牙"
+  },
+  {
+    "name": "紐約",
+    "lat": 40.726028,
+    "lon": -73.996505,
+    "tz": "America/New_York",
+    "country": "美國"
+  }
 ];
 
 const TAIPEI_TZ = "Asia/Taipei";
@@ -107,6 +488,15 @@ function findMatches(targetWallTime, queryInstant, cities = CITIES) {
 function queryWithEarliest(targetWallTime, queryInstant, cities = CITIES) {
   const matches = findMatches(targetWallTime, queryInstant, cities);
   if (matches.length) return { rows: matches, earliest: false };
+  const candidates = getTargetOccurrences(targetWallTime, queryInstant, cities);
+  const first = candidates[0];
+  if (first && queryInstant < first.instant) {
+    return { rows: candidates.filter(row => row.instant.getTime() === first.instant.getTime()), earliest: true };
+  }
+  return { rows: [], earliest: false };
+}
+
+function getTargetOccurrences(targetWallTime, queryInstant, cities = CITIES) {
   const candidates = [];
   for (const city of cities) {
     const offsets = new Set();
@@ -122,12 +512,7 @@ function queryWithEarliest(targetWallTime, queryInstant, cities = CITIES) {
       }
     }
   }
-  candidates.sort((a, b) => a.instant - b.instant);
-  const first = candidates[0];
-  if (first && queryInstant < first.instant) {
-    return { rows: candidates.filter(row => row.instant.getTime() === first.instant.getTime()), earliest: true };
-  }
-  return { rows: [], earliest: false };
+  return candidates.sort((a, b) => a.instant - b.instant);
 }
 
 function appendTaipeiTime(element, time) {
@@ -170,7 +555,7 @@ function renderResults(rows, resultEl) {
       const entry = document.createElement("div");
       entry.className = "city-result";
       const name = document.createElement("div");
-      name.textContent = city.name + "（" + city.tz + "）";
+      name.textContent = city.country + "-" + city.name;
       const coordinateRow = document.createElement("div");
       coordinateRow.className = "coordinate-row";
       const coordinates = city.lat.toFixed(6) + ", " + city.lon.toFixed(6);
@@ -216,15 +601,33 @@ function pickerValue(date, hour) {
   return date.replaceAll("-", "") + " " + hour + ":00";
 }
 
-function selectNextTarget(targets, queryInstant) {
-  const parts = getDateTimeParts(queryInstant, TAIPEI_TZ);
-  const b = wallTimeFromParts({ ...parts, minute: 0, second: 0 });
+function selectNextTarget(targets, queryInstant, cities = CITIES) {
+  const start = Math.floor(queryInstant.getTime() / (60 * MINUTE)) * 60 * MINUTE;
   return targets.map((value, index) => {
+    let text, time;
+    try { text = pickerValue(value.date, value.hour); time = parseWallTime(text); }
+    catch { throw new Error("時間 A" + (index + 1) + "：請選擇有效日期與小時。"); }
+    const next = getTargetOccurrences(time, queryInstant, cities).find(row => row.instant.getTime() >= start);
+    return next ? { index, text, time, nextInstant: next.instant } : null;
+  }).filter(Boolean).sort((a, b) => a.nextInstant - b.nextInstant || a.time - b.time || a.index - b.index)[0] || null;
+}
+
+function queryAllTargets(targets, queryInstant, cities = CITIES) {
+  // Validate every input before displaying any partial result.
+  const parsed = targets.map((value, index) => {
     try {
       const text = pickerValue(value.date, value.hour);
       return { index, text, time: parseWallTime(text) };
     } catch { throw new Error("時間 A" + (index + 1) + "：請選擇有效日期與小時。"); }
-  }).filter(value => value.time >= b).sort((a, b) => a.time - b.time || a.index - b.index)[0] || null;
+  });
+  const groups = parsed.map(target => ({ ...target, rows: findMatches(target.time, queryInstant, cities), earliest: false }))
+    .filter(group => group.rows.length);
+  if (groups.length) return { groups, expired: false };
+  // Keep the existing earliest-event fallback only when no A matches the window.
+  const next = selectNextTarget(targets, queryInstant, cities);
+  if (!next) return { groups: [], expired: true };
+  const fallback = queryWithEarliest(next.time, queryInstant, cities);
+  return { groups: fallback.rows.length ? [{ ...next, ...fallback }] : [], expired: false };
 }
 
 if (typeof document !== "undefined") {
@@ -343,18 +746,37 @@ if (typeof document !== "undefined") {
         catch (error) { throw new Error(`時間 B：${error.message}`); }
       }
       readTargets();
-      const next = selectNextTarget(targets, queryInstant);
+      const { groups, expired } = queryAllTargets(targets, queryInstant);
       saveTarget();
-      if (!next) {
-        queryTimeEl.textContent = ""; resultText = "";
-        resultEl.textContent = "A時間已過"; copyBtn.disabled = true;
+      queryTimeEl.textContent = "";
+      if (!groups.length) {
+        resultText = "";
+        resultEl.textContent = expired ? "A時間已過" : "目前小時至未來一小時內沒有符合條件的地點。";
+        copyBtn.disabled = true;
         return;
       }
-      const { rows, earliest } = queryWithEarliest(next.time, queryInstant);
-      queryTimeEl.textContent = `目標 A${next.index + 1}（各地當地時間）：${next.text}`;
-      if (earliest) queryTimeEl.append("\nB 早於所有城市到達 A 的時間；以下顯示最早到達的城市（超出一小時範圍）。");
-      resultText = renderResults(rows, resultEl);
-      copyBtn.disabled = rows.length === 0;
+      const title = group => `目標 A${group.index + 1}（各地當地時間）：${group.text}`;
+      if (groups.length === 1) {
+        const group = groups[0];
+        queryTimeEl.textContent = title(group);
+        if (group.earliest) queryTimeEl.append("\nB 早於所有城市到達 A 的時間；以下顯示最早到達的城市（超出一小時範圍）。");
+        resultText = renderResults(group.rows, resultEl);
+      } else {
+        resultEl.replaceChildren();
+        resultText = groups.map(group => {
+          const section = document.createElement("section");
+          section.className = "target-result-group";
+          const heading = document.createElement("h3");
+          heading.className = "target-result-title";
+          heading.textContent = title(group);
+          const content = document.createElement("div");
+          const text = renderResults(group.rows, content);
+          section.append(heading, content);
+          resultEl.append(section);
+          return title(group) + "\n\n" + text;
+        }).join("\n\n");
+      }
+      copyBtn.disabled = false;
     } catch (error) {
       queryTimeEl.textContent = "";
       resultText = "";
@@ -365,5 +787,5 @@ if (typeof document !== "undefined") {
   copyBtn.addEventListener("click", () => copyText(resultText, copyBtn, "複製結果"));
 }
 if (typeof module !== "undefined") {
-  module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime, queryWithEarliest, selectNextTarget };
+  module.exports = { CITIES, parseWallTime, parseTaipeiInput, findMatches, formatDateTime, queryWithEarliest, selectNextTarget, queryAllTargets };
 }
